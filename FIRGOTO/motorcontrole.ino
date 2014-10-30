@@ -19,13 +19,13 @@ void iniciapmotores()
 void acionamotor() {
   rampa();
   ganhoaz++;
-  if (ganhoaz  >= intervalaz)
+  if (ganhoaz  >= (intervalaz + 3))
   {
     ganhoaz = 0;
     gotoAz();
   }
   ganhoalt++;
-  if (ganhoalt  >= intervalalt)
+  if (ganhoalt  >= intervalalt + 3)
   {
     ganhoalt = 0;
     gotoAlt();
@@ -94,11 +94,12 @@ int gotoAz()
 void rampa()
 {
   currentMillis = millis();
-  if (currentMillis - previousMillis >= 4)
+  if (currentMillis - previousMillis >= 5)
   {
     previousMillis = currentMillis;
 
 
+    accelaz++;
     accelaz++;
     intervalaz = 10000 / (accelaz);
     erroAZ = (abs)(AZmount -  AZmountAlvo);
@@ -108,6 +109,7 @@ void rampa()
       accelaz = erroAZ;
     }
 
+    accelalt++;
     accelalt++;
     intervalalt = 10000 / (accelalt);
     erroALT = (abs)(ALTmount -  ALTmountAlvo);

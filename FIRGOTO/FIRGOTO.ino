@@ -21,7 +21,7 @@
 #define PassoAzpino 10
 
 //valores maximo para o passo (Valor ideal 1286400)
-#define MaxPassoAlt 1286400  //valor de resolucao AR = Passo * MicroPasso * reducao ex(200*16*402)
+#define MaxPassoAlt 321600  //valor de resolucao AR = Passo * MicroPasso * reducao ex(200*16*402)/4
 #define MaxPassoAz 1286400  //valor de resolucao AR = Passo * MicroPasso * reducao ex(200*16*402)
 
 #define MaxVeloAz 21600.0
@@ -29,9 +29,9 @@
 
 #define AcelAz 2000.0
 #define AcelAlt 2000.0
-int Tpulso = 95;
+int Tpulso = 35;
 int veloc = 0;
-double incliRampa = 0.8;
+double incliRampa = 3;
 int intervalalt = 10;
 int intervalaz = 10;
 int ganhoaz = 1;
