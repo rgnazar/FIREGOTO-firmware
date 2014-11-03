@@ -1,4 +1,4 @@
-FIRGOTO
+﻿FIREGOTO
 =======
 
 firmware para controlar telescopio dobson usando Arduino Due
