@@ -313,7 +313,7 @@ void setLocalHora()//:SLHH:MM:SS#  Set the local Time
   int mes = month();
   int ano = year();
   setTime(HH, MM, SS, dia, mes, ano);
-  int tmp = UTC * 60 * 60;
+  int tmp = UTC * (-1) * 60 * 60;
   adjustTime(tmp);
   SerialPrint("1");
 
@@ -321,17 +321,17 @@ void setLocalHora()//:SLHH:MM:SS#  Set the local Time
 
 void PrintLocalHora()//:Get time (Local) 	:GLHH:MM:SS#	Reply: HH:MM:SS#
 {
-int hhl=int(hour());
+  int hhl = int(hour() + UTC);
 
 
-	if (hhl > 23)
-				{
-					hhl=hhl-24;
-				}
-				if (hhl < 0)
-				{
-					hhl=hhl+24;
-				}
+  if (hhl > 23)
+  {
+    hhl = hhl - 24;
+  }
+  if (hhl < 0)
+  {
+    hhl = hhl + 24;
+  }
 
 
   char str[10];
@@ -409,26 +409,18 @@ void printAZmount()
 
 void printALTmount() //:GA# Get Telescope Altitude Returns: sDD*MM# or sDD*MM'SS#
 {
-  int tmp = (int)DecDegtoDeg(eixoAltGrausDecimal);
-  if (tmp < 10) {
-    SerialPrint("0");
+  char str[9];
+  int Ddeg, Min, Sec;
+  Ddeg = (int)DecDegtoDeg(eixoAltGrausDecimal);
+  Min = (int)DecDegtoMin(eixoAltGrausDecimal);
+  Sec = (int)DecDegtoSec(eixoAltGrausDecimal);
+  if (Ddeg < 0) {
+    sprintf(str, "-%02d*%02d:%02d#", int(Ddeg), int(Min), int(Sec));
+  } else {
+    sprintf(str, "+%02d*%02d:%02d#", int(Ddeg), int(Min), int(Sec));
   }
-  SerialPrint(String(tmp));
-  SerialPrint("*");
-  tmp = (int)DecDegtoMin(eixoAltGrausDecimal);
-  if (tmp < 10) {
-    SerialPrint("0");
-  }
-  SerialPrint(String(tmp));
-  char caracter = 223;
-  SerialPrint(String(caracter));
+  SerialPrint(str);
 
-  tmp = (int)DecDegtoSec(eixoAltGrausDecimal);
-  if (tmp < 10) {
-    SerialPrint("0");
-  }
-  SerialPrint(String(tmp));
-  SerialPrint("#");
 }
 
 void printRAmount() //:GR# Get Telescope RA Returns: HH:MM.T# or HH:MM:SS#
@@ -695,11 +687,11 @@ void setHoraparaUTC() //:SG-03# :SGsHH.H# Set the number of hours added to local
   String str = "";
   str += inputcmd[4];
   str += inputcmd[5];
-  str += inputcmd[6];
   UTC = str.toInt();
-  str = "";
-  int tmp = int(UTC) * 60 * 60;
-  adjustTime(tmp);
+  if (inputcmd[3] == '-')
+  {
+    UTC = UTC * -1;
+  }
   SerialPrint("1");
 }
 
