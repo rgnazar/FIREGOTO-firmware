@@ -321,9 +321,21 @@ void setLocalHora()//:SLHH:MM:SS#  Set the local Time
 
 void PrintLocalHora()//:Get time (Local) 	:GLHH:MM:SS#	Reply: HH:MM:SS#
 {
+int hhl=int(hour());
+
+
+	if (hhl > 23)
+				{
+					hhl=hhl-24;
+				}
+				if (hhl < 0)
+				{
+					hhl=hhl+24;
+				}
+
 
   char str[10];
-  sprintf(str, "%02d:%02d:%02d#", int(hour()), int(minute()), int(second()));
+  sprintf(str, "%02d:%02d:%02d#", hhl, int(minute()), int(second()));
   SerialPrint(str);
 }
 
