@@ -26,10 +26,8 @@ void PIDCalc()
     Iaz = Iaz + (Palt * intervalpid) * kI;
     Dalt = (erroalt - erroaltprevious) / intervalpid * kD;
     Daz = (erroaz - erroazprevious) / intervalpid * kD;
-    PIDaz = Paz + Iaz + Daz + PIDaz;
-    PIDalt = Palt + Ialt + Dalt + PIDalt;
-    PIDalt = PIDalt /2;
-    PIDaz = PIDaz /2;
+    if (PIDaz == 0 ){ PIDaz = Paz + Iaz + Daz;} else {PIDaz = (Paz + Iaz + Daz + PIDaz) /2;}
+    if (PIDalt == 0 ){PIDalt = Palt + Ialt + Dalt;} else {PIDalt = (Palt + Ialt + Dalt + PIDalt)/2;}
   }
 }
 

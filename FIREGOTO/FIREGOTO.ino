@@ -67,7 +67,7 @@ float Accelalt = MaxPassoAlt, Accelaz = MaxPassoAz;
 float kP = 1;
 float kI = 0;
 float kD = 0;
-double erroaltprevious, erroalt, erroazprevious, erroaz, PIDalt = MaxPassoAlt, PIDaz=MaxPassoAz;
+double erroaltprevious, erroalt, erroazprevious, erroaz, PIDalt=0, PIDaz=0;
 double intervalpid = millis();
 double timerpid = millis();
 double intervalpulseaz = intervalpid, intervalpulsealt = intervalpid;
