@@ -26,8 +26,39 @@ void PIDCalc()
     Iaz = Iaz + (Palt * intervalpid) * kI;
     Dalt = (erroalt - erroaltprevious) / intervalpid * kD;
     Daz = (erroaz - erroazprevious) / intervalpid * kD;
-    if (PIDaz == 0 ){ PIDaz = Paz + Iaz + Daz;} else {PIDaz = (Paz + Iaz + Daz + PIDaz) /2;}
-    if (PIDalt == 0 ){PIDalt = Palt + Ialt + Dalt;} else {PIDalt = (Palt + Ialt + Dalt + PIDalt)/2;}
+    //    if (PIDaz == 0 ){ PIDaz = Paz + Iaz + Daz;} else {PIDaz = (Paz + Iaz + Daz + PIDaz) /2;}
+    //   if (PIDalt == 0 ){PIDalt = Palt + Ialt + Dalt;} else {PIDalt = (Palt + Ialt + Dalt + PIDalt)/2;}
+    ///////////////////////////////Media AZ
+
+    if (PIDaz == 0 ) {
+      for (int i = 0; i < 10; i++) {
+        aPIDaz[i] = Paz + Iaz + Daz;
+      }
+    } else
+    {
+      if (iPIDaz > 9 ) {
+        iPIDaz = 0;
+      }
+      aPIDaz[iPIDaz] = Paz + Iaz + Daz;
+      PIDaz = aPIDaz[0] + aPIDaz[1] + aPIDaz[2] + aPIDaz[3] + aPIDaz[4] + aPIDaz[5] + aPIDaz[6] + aPIDaz[7] + aPIDaz[8]+aPIDaz[9];
+      PIDaz = PIDaz / 10;
+      iPIDaz++;
+    }
+    ///////////////////////////////Media ALT
+    if (PIDalt == 0 ) {
+      for (int i = 0; i < 10; i++) {
+        aPIDalt[i] = Palt + Ialt + Dalt;
+      }
+    } else
+    {
+      if (iPIDalt > 9 ) {
+        iPIDalt = 0;
+      }
+      aPIDalt[iPIDalt] = Palt + Ialt + Dalt;
+      PIDalt = aPIDalt[0] + aPIDalt[1] + aPIDalt[2] + aPIDalt[3] + aPIDalt[4] + aPIDalt[5] + aPIDalt[6] + aPIDalt[7] + aPIDalt[8]+aPIDalt[9];
+      PIDalt = PIDalt / 10;
+      iPIDalt++;
+    }
   }
 }
 
@@ -56,8 +87,8 @@ void acionamotor() {
       }
       else
       {
-        if (Accelaz > (MaxPassoAz/500)) {
-          Accelaz = (MaxPassoAz/500);
+        if (Accelaz > (MaxPassoAz / 500)) {
+          Accelaz = (MaxPassoAz / 500);
         }
         Accelaz = (Accelaz * 0.9995);
       }
@@ -89,8 +120,8 @@ void acionamotor() {
       }
       else
       {
-        if (Accelalt > (MaxPassoAlt/500)) {
-          Accelalt = (MaxPassoAlt/500);
+        if (Accelalt > (MaxPassoAlt / 500)) {
+          Accelalt = (MaxPassoAlt / 500);
         }
         Accelalt = (Accelalt * 0.9995);
       }
