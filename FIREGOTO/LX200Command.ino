@@ -3,6 +3,17 @@
 void executecommand()
 { if (cmdComplete) {
     Serial.println(inputcmd);
+
+    Serial.println("PIDalt");
+    Serial.println(PIDalt);
+
+    Serial.println("PIDaz");
+    Serial.println(PIDaz);
+
+
+
+
+
     if (inputcmd[0] != ':')
     {
       if (inputcmd[0] == 0x06)
@@ -186,6 +197,10 @@ void executecommand()
           case 'w':
             setBufferGps();
             break;
+          case 'z':
+            setPID();
+            break;
+
 
         }
         /*
@@ -367,6 +382,20 @@ Indeed  :
 void  setBufferGps()
 {
   SerialPrint("1");
+}
+
+void  setPID() //:Sz00.0#
+{
+  char floatbuf[32]; // make this at least big enough for the whole string
+  String str;
+  str += inputcmd[3];
+  str += inputcmd[4];
+  str += inputcmd[5];
+  str += inputcmd[6];
+  str.toCharArray(floatbuf, sizeof(floatbuf));
+  tt  = atof(floatbuf);
+
+
 }
 
 void printSideralHora()
@@ -758,7 +787,7 @@ void synctelescope() //Sync. with current target RA/Dec	:CS#	Reply: [none]
   double HSL = HoraSiderallocal(longitude, HST) ;
   Radec2Azalt(HSL, latitude, RAAlvo, DECAlvo, &AzAlvo, &AltAlvo);
   if ((AzAlvo >= 0) && (AltAlvo >= 0)) {
-    ALTmount = (MaxPassoAlt * AltAlvo / 90.0);
+    ALTmount = (MaxPassoAlt * AltAlvo / 360.0);
     AZmount = (MaxPassoAz * AzAlvo / 360.0);
   }
 
@@ -771,7 +800,7 @@ void synctelescopeString() //:CM# Synchronizes the telescope position with targe
   double HSL = HoraSiderallocal(longitude, HST) ;
   Radec2Azalt(HSL, latitude, RAAlvo, DECAlvo, &AzAlvo, &AltAlvo);
   if ((AzAlvo >= 0) && (AltAlvo >= 0)) {
-    ALTmount = (MaxPassoAlt * AltAlvo / 90.0);
+    ALTmount = (MaxPassoAlt * AltAlvo / 360.0);
     AZmount = (MaxPassoAz * AzAlvo / 360.0);
 
   }
@@ -821,7 +850,7 @@ void gototeleEQAR ()// Move telescope (to current Equ target)	:MS#
   double HSL = HoraSiderallocal(longitude, HST) ;
   Radec2Azalt(HSL, latitude, RAAlvo, DECAlvo, &AzAlvo, &AltAlvo);
   if ((AzAlvo >= 0) && (AltAlvo >= 0)) {
-    ALTmountAlvo = (MaxPassoAlt * AltAlvo / 90.0);
+    ALTmountAlvo = (MaxPassoAlt * AltAlvo / 360.0);
     AZmountAlvo = (MaxPassoAz * AzAlvo / 360.0);
     SerialPrint("0");
   } else
@@ -845,7 +874,7 @@ void acompanhamento()
   double HSL = HoraSiderallocal(longitude, HST) ;
   Radec2Azalt(HSL, latitude, RAAlvo, DECAlvo, &AzAlvo, &AltAlvo);
   if ((AzAlvo >= 0) && (AltAlvo >= 0)) {
-    ALTmountAlvo = (MaxPassoAlt * AltAlvo / 90.0);
+    ALTmountAlvo = (MaxPassoAlt * AltAlvo / 360.0);
     AZmountAlvo = (MaxPassoAz * AzAlvo / 360.0);
   }
 

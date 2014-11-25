@@ -19,31 +19,15 @@
 #define DirAzpino 11
 #define PassoAltpino 6
 #define PassoAzpino 10
+#define MinTimer 47
 
 //valores maximo para o passo (Valor ideal 1286400)
-#define MaxPassoAlt 321600  //valor de resolucao AR = Passo * MicroPasso * reducao ex(200*16*402)/4
+#define MaxPassoAlt 1286400  //valor de resolucao AR = Passo * MicroPasso * reducao ex(200*16*402)/4
 #define MaxPassoAz 1286400  //valor de resolucao AR = Passo * MicroPasso * reducao ex(200*16*402)
 
-#define MaxVeloAz 21600.0
-#define MaxVeloAlt 21600.0
-
-#define AcelAz 2000.0
-#define AcelAlt 2000.0
-int Tpulso = 35;
-int veloc = 0;
-double incliRampa = 3;
-int intervalalt = 10;
-int intervalaz = 10;
-int ganhoaz = 1;
-int ganhoalt = 1;
-int accelaz = 1;
-int accelalt = 1;
+int veloc;
 int currentMillis, previousMillis;
 int sul = 0, leste = 0, oeste = 0, norte = 0;
-
-
-
-
 
 
 // Location ----------------------------------------------------------------------------------------------------------------
@@ -73,7 +57,21 @@ double AZmount = 0.0;
 double ALTmount = 0.0;
 double AZmountAlvo = 0.0;
 double ALTmountAlvo = 0.0;
-double erroAZ, erroALT;
+
+
+//PID Variaveis
+float Palt = 0, Paz = 0;
+float Ialt = 0, Iaz = 0;
+float Dalt = 0, Daz = 0;
+float Accelalt = MaxPassoAlt, Accelaz = MaxPassoAz;
+float kP = 1;
+float kI = 0;
+float kD = 0;
+double erroaltprevious, erroalt, erroazprevious, erroaz, PIDalt = MaxPassoAlt, PIDaz=MaxPassoAz;
+double intervalpid = millis();
+double timerpid = millis();
+double intervalpulseaz = intervalpid, intervalpulsealt = intervalpid;
+double tt=100;
 
 
 //Alvos a serem seguidos ou sincronizado
@@ -103,6 +101,7 @@ void setup() {
 
 
 void loop() {
+  PIDCalc();
   CalcPosicaoPasso();
   // print the string when a newline arrives:
  // protegemount();
