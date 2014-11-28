@@ -7,3 +7,7 @@ Projeto que contempla o uso de Android ou Desktop + Arduino usando o protocolo L
 Informações www.astronomoamador.com.br
 APK para Android
 https://github.com/inmjava/FIRGOTO
+
+
+TELESCOPE CONTROL ARDUINI DUE
+DOBSON ALTZIMUTH
