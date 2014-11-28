@@ -69,7 +69,8 @@ double JulianoDay (double y, double m, double d, double decH) {
 
 //converte Hora em HoraDecimal
 double  Hora2DecHora(double h, double mins, double ss) {
-  return (h + (mins / 60.0) + (ss / 60.0 / 60.0));
+  fractime = millis() % 1000;
+  return (h + (mins / 60.0) + (ss / 60.0 / 60.0) + fractime/1001);
 }
 
 

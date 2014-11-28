@@ -34,6 +34,7 @@ int sul = 0, leste = 0, oeste = 0, norte = 0;
 double latitude  = -25.40;
 double longitude = -49.20;
 int UTC = 0;
+int fractime;
 
 //Variaveis de controle para ler comandos LX200  ----------------------------------------------------------------------------------------------------------------
 boolean cmdComplete = false, doispontos = true; // whether the string is complete
