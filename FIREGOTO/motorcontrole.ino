@@ -16,6 +16,8 @@ void iniciapmotores()
 
 void PIDCalc()
 {
+  double microsfixo = micros();
+
   if (timerpid + tt < millis())
   {
     intervalpid = millis() - timerpid;
@@ -26,38 +28,29 @@ void PIDCalc()
     Iaz = Iaz + (Palt * intervalpid) * kI;
     Dalt = (erroalt - erroaltprevious) / intervalpid * kD;
     Daz = (erroaz - erroazprevious) / intervalpid * kD;
-    //    if (PIDaz == 0 ){ PIDaz = Paz + Iaz + Daz;} else {PIDaz = (Paz + Iaz + Daz + PIDaz) /2;}
-    //   if (PIDalt == 0 ){PIDalt = Palt + Ialt + Dalt;} else {PIDalt = (Palt + Ialt + Dalt + PIDalt)/2;}
-    ///////////////////////////////Media AZ
-
     if (PIDaz == 0 ) {
-      for (int i = 0; i < 10; i++) {
-        aPIDaz[i] = Paz + Iaz + Daz;
+      PIDaz = Paz + Iaz + Daz;
+    } else {
+      if (abs(PIDaz) > 15)
+      {
+        PIDaz = (Paz + Iaz + Daz + (4 * PIDaz)) / 5;
       }
-    } else
-    {
-      if (iPIDaz > 9 ) {
-        iPIDaz = 0;
+      else
+      {
+        PIDaz = (Paz + Iaz + Daz + (99 * PIDaz)) / 100;
       }
-      aPIDaz[iPIDaz] = Paz + Iaz + Daz;
-      PIDaz = aPIDaz[0] + aPIDaz[1] + aPIDaz[2] + aPIDaz[3] + aPIDaz[4] + aPIDaz[5] + aPIDaz[6] + aPIDaz[7] + aPIDaz[8]+aPIDaz[9];
-      PIDaz = PIDaz / 10;
-      iPIDaz++;
     }
-    ///////////////////////////////Media ALT
     if (PIDalt == 0 ) {
-      for (int i = 0; i < 10; i++) {
-        aPIDalt[i] = Palt + Ialt + Dalt;
+      PIDalt = Palt + Ialt + Dalt;
+    } else {
+      if (abs(PIDalt) > 15)
+      {
+        PIDalt = (Palt + Ialt + Dalt + (4 * PIDalt)) / 5;
       }
-    } else
-    {
-      if (iPIDalt > 9 ) {
-        iPIDalt = 0;
+      else
+      {
+        PIDalt = (Palt + Ialt + Dalt + (99 * PIDalt)) / 100;
       }
-      aPIDalt[iPIDalt] = Palt + Ialt + Dalt;
-      PIDalt = aPIDalt[0] + aPIDalt[1] + aPIDalt[2] + aPIDalt[3] + aPIDalt[4] + aPIDalt[5] + aPIDalt[6] + aPIDalt[7] + aPIDalt[8]+aPIDalt[9];
-      PIDalt = PIDalt / 10;
-      iPIDalt++;
     }
   }
 }
@@ -65,76 +58,74 @@ void PIDCalc()
 void acionamotor() {
   erroazprevious = erroaz;
   erroaz = AZmount -  AZmountAlvo;
+  double microsfixo = micros();
   erroaltprevious = erroalt;
   erroalt = ALTmount -  ALTmountAlvo;
 
   /////////////////////////AZ MOV
-  if (PIDaz == 0)
+  if (microsfixo > intervalpulseaz)
   {
-    if (micros() > intervalpulseaz)
+
+
+    /////Accelaz
+    if (Accelaz < MaxPassoAz / abs(PIDaz))
     {
-      intervalpulseaz = Accelaz + micros();
-      gotoAz();
+      Accelaz = MaxPassoAz / abs(PIDaz);
     }
-  }
-  else
-  {
-    if (micros() > intervalpulseaz)
+    else
     {
-      if (Accelaz < MaxPassoAz / abs(PIDaz))
-      {
-        Accelaz = MaxPassoAz / abs(PIDaz);
+      if (Accelaz > (MaxPassoAz / 250)) {
+        Accelaz = (MaxPassoAz / 250);
       }
-      else
-      {
-        if (Accelaz > (MaxPassoAz / 500)) {
-          Accelaz = (MaxPassoAz / 500);
-        }
-        Accelaz = (Accelaz * 0.9995);
-      }
-      if (Accelaz < (3 * MinTimer))
-      {
-        Accelaz = 3 * MinTimer;
-      }
-      intervalpulseaz = Accelaz + micros();
-      gotoAz();
+      Accelaz = (Accelaz * 0.999);
     }
 
+
+    if (Accelaz < (3 * MinTimer))
+    {
+      Accelaz = 3 * MinTimer;
+    }
+    if (Accelaz > MaxPassoAz)
+    {
+      Accelaz = MaxPassoAz;
+    }
+
+
+    intervalpulseaz = Accelaz + microsfixo;
+    gotoAz();
   }
   /////////////////////////ALT MOV
-  if (PIDalt == 0)
+  if (microsfixo > intervalpulsealt)
   {
-    if (micros() > intervalpulsealt)
+
+
+    /////Accelalt
+    if (Accelalt < MaxPassoAlt / abs(PIDalt))
     {
-      intervalpulsealt = Accelalt + micros();
-      gotoAlt();
+      Accelalt = MaxPassoAlt / abs(PIDalt);
     }
-  }
-  else
-  {
-    if (micros() > intervalpulsealt)
+    else
     {
-      if (Accelalt < MaxPassoAlt / abs(PIDalt))
-      {
-        Accelalt = MaxPassoAlt / abs(PIDalt);
+      if (Accelalt > (MaxPassoAlt / 250)) {
+        Accelalt = (MaxPassoAlt / 250);
       }
-      else
-      {
-        if (Accelalt > (MaxPassoAlt / 500)) {
-          Accelalt = (MaxPassoAlt / 500);
-        }
-        Accelalt = (Accelalt * 0.9995);
-      }
-      if (Accelalt < (3 * MinTimer))
-      {
-        Accelalt = 3 * MinTimer;
-      }
-      intervalpulsealt = Accelalt + micros();
-      gotoAlt();
+      Accelalt = (Accelalt * 0.999);
+    }
+    if (Accelalt < (3 * MinTimer))
+    {
+      Accelalt = 3 * MinTimer;
+    }
+    if (Accelalt > MaxPassoAlt)
+    {
+      Accelalt = MaxPassoAlt;
     }
 
-  }
 
+
+
+    intervalpulsealt = Accelalt + microsfixo;
+    gotoAlt();
+  }
 }
 
 
@@ -259,8 +250,6 @@ void  protegemount()
     paramotors();
     ativaacom = 0;
   }
-
-
 }
 
 

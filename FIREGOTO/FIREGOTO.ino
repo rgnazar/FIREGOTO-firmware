@@ -13,12 +13,12 @@
 //Criacao dos motores
 
 
-#define MicroPassoAltpino 5
-#define MicroPassoAzpino 9
-#define DirAltpino 7
-#define DirAzpino 11
-#define PassoAltpino 6
-#define PassoAzpino 10
+#define MicroPassoAltpino 9
+#define MicroPassoAzpino 5
+#define DirAltpino 11
+#define DirAzpino 7
+#define PassoAltpino 10
+#define PassoAzpino 6
 #define MinTimer 47
 
 //valores maximo para o passo (Valor ideal 1286400)
@@ -56,8 +56,8 @@ double RAmount = 0.0;
 double DECmount = 0.0;
 double AZmount = 0.0;
 double ALTmount = 0.0;
-double AZmountAlvo = 0.0;
-double ALTmountAlvo = 0.0;
+double AZmountAlvo = 0.1;
+double ALTmountAlvo = 0.1;
 
 
 //PID Variaveis
@@ -75,7 +75,7 @@ int iPIDaz=0;
 double aPIDaz[10];
 double intervalpid = millis();
 double timerpid = millis();
-double intervalpulseaz = intervalpid, intervalpulsealt = intervalpid;
+double intervalpulseaz = 0.0, intervalpulsealt = 0.0;
 double tt=100;
 
 

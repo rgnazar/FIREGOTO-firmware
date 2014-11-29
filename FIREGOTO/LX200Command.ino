@@ -11,9 +11,6 @@ void executecommand()
     Serial.println(PIDaz);
 
 
-
-
-
     if (inputcmd[0] != ':')
     {
       if (inputcmd[0] == 0x06)
