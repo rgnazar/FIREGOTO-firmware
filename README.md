@@ -9,7 +9,7 @@ APK para Android
 https://github.com/inmjava/FIRGOTO
 
 
-TELESCOPE CONTROL ARDUINI DUE
+TELESCOPE CONTROL ARDUINO DUE
 DOBSON ALTZIMUTH
 
 https://github.com/juanrmn/Arduino-Telescope-Control/tree/master/testing/device/arduino/example
