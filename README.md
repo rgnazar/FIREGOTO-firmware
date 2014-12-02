@@ -11,3 +11,5 @@ https://github.com/inmjava/FIRGOTO
 
 TELESCOPE CONTROL ARDUINI DUE
 DOBSON ALTZIMUTH
+
+https://github.com/juanrmn/Arduino-Telescope-Control/tree/master/testing/device/arduino/example
