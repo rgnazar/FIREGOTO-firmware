@@ -19,10 +19,6 @@ void Azalt2Radec(double latitude, double longitude, double az, double el, double
   if (*ra < 0) {
     *ra = *ra + 360;
   }
-
-
-
-
 }
 
 

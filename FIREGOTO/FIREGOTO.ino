@@ -1,5 +1,4 @@
-
-
+#include <AccelStepper.h>
 #include <Arduino.h>
 #include <math.h>
 #include <Time.h>
@@ -19,17 +18,22 @@
 #define DirAzpino 7
 #define PassoAltpino 10
 #define PassoAzpino 6
-#define MinTimer 47
+
+AccelStepper AltMotor(AccelStepper::DRIVER, PassoAltpino, DirAltpino);
+AccelStepper AzMotor(AccelStepper::DRIVER, PassoAzpino, DirAzpino);
+int accel = 1;
+
 
 //valores maximo para o passo (Valor ideal 1286400)
-#define MaxPassoAlt 1286400  //valor de resolucao AR = Passo * MicroPasso * reducao ex(200*16*402)/4
-#define MaxPassoAz 1286400  //valor de resolucao AR = Passo * MicroPasso * reducao ex(200*16*402)
+#define MaxPassoAlt 1906036  //valor de resolucao AR = Passo * MicroPasso * reducao ex(200*16*402)/4    (16*200*(117/11)*56)
+#define MaxPassoAz 1906036  //valor de resolucao AR = Passo * MicroPasso * reducao ex(200*16*402)   (16*200*(118/11)*57)
+#define MinTimer 150
+
+
 
 int veloc;
-int currentMillis, previousMillis;
+unsigned long currentMillis, previousMillis = 0;
 int sul = 0, leste = 0, oeste = 0, norte = 0;
-
-
 // Location ----------------------------------------------------------------------------------------------------------------
 double latitude  = -25.40;
 double longitude = -49.20;
@@ -38,11 +42,12 @@ int fractime;
 
 //Variaveis de controle para ler comandos LX200  ----------------------------------------------------------------------------------------------------------------
 boolean cmdComplete = false, doispontos = true; // whether the string is complete
-char buffercmd[20];
-char inputcmd[20];// a string to hold incoming data
+char buffercmd[30];
+char inputcmd[30];// a string to hold incoming data
 int pontBuffer = 0;
 int pontCommand = 0;
-int pontBufferold = 0;
+int numCommand = 0;
+
 
 
 //Variaveis globais da MEADE
@@ -60,23 +65,6 @@ double AZmountAlvo = 0.1;
 double ALTmountAlvo = 0.1;
 
 
-//PID Variaveis
-float Palt = 0, Paz = 0;
-float Ialt = 0, Iaz = 0;
-float Dalt = 0, Daz = 0;
-float Accelalt = MaxPassoAlt, Accelaz = MaxPassoAz;
-float kP = 1;
-float kI = 0;
-float kD = 0;
-double erroaltprevious, erroalt, erroazprevious, erroaz, PIDalt=0, PIDaz=0;
-double aPIDalt[10];
-int iPIDalt=0;
-int iPIDaz=0;
-double aPIDaz[10];
-double intervalpid = millis();
-double timerpid = millis();
-double intervalpulseaz = 0.0, intervalpulsealt = 0.0;
-double tt=100;
 
 
 //Alvos a serem seguidos ou sincronizado
@@ -93,11 +81,10 @@ int AltitudeLimite = 90;
 
 
 void setup() {
-  Timer3.attachInterrupt(acionamotor);  // initialize serial:
+  Timer3.attachInterrupt(acionamotor);
   Serial.begin(9600);
   Serial2.begin(9600);
   iniciapmotores();
-  CalcPosicaoPasso();
   setTime(22, 00, 00, 23, 03, 2014);
   SerialPrint("00:00:00#"); //RTA para leitura do driver ASCOM da MEADE autostar I
   delay (200);
@@ -106,24 +93,17 @@ void setup() {
 
 
 void loop() {
-  PIDCalc();
+  currentMillis = millis();  
   CalcPosicaoPasso();
+
   // print the string when a newline arrives:
- // protegemount();
+  // protegemount();
   if (ativaacom != 0)
   {
-    acompanhamento();
-  }
-  else
-  {
-    movimentamotor();
-  }
-  if (cmdComplete) {
-    executecommand();
-    inputcmd[1] = 'Y';
-  } else
-  {
-    lebuffercomand();
+     setaccel();
+     CalcPosicaoPasso();
+     SetPosition();
+     acompanhamento();
   }
 }
 

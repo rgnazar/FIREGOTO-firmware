@@ -1,5 +1,5 @@
 
-void lebuffercomand()
+/*void lebuffercomand()
 {
   if (pontBufferold != pontBuffer)
   {
@@ -24,13 +24,13 @@ void lebuffercomand()
     }
     pontBufferold = pontBufferold + 1;
     pontCommand = pontCommand + 1;
-    if (pontBufferold > 19)
+    if (pontBufferold > 29)
     {
       pontBufferold = 0;
     }
 
   }
-}
+}*/
 void SerialPrint(String str)
 {
   Serial.print(str);
@@ -41,9 +41,27 @@ void serialEvent() {
   while (Serial.available()) {
     // get the new byte:
     char inChar = (char)Serial.read();
-    buffercmd[pontBuffer] = inChar;
-    pontBuffer = pontBuffer + 1;
-    if (pontBuffer > 19)
+    if (inChar != ' ' )
+    {
+      pontBuffer = pontBuffer + 1;
+      buffercmd[pontBuffer] = inChar;
+    }
+    if (inChar == ':' && buffercmd[1] != 'S')
+    {
+      pontBuffer = 0;
+      buffercmd[pontBuffer] = inChar;
+    }
+    if (inChar == '#' &&  pontBuffer > 0 )
+    {
+      cmdComplete = true;
+      pontBuffer = pontBuffer + 1;
+      buffercmd[pontBuffer] = inChar;
+      memcpy(inputcmd, buffercmd, pontBuffer);
+      pontBuffer = 0;
+      buffercmd[1] = '@';
+      executecommand();
+    }
+    if (pontBuffer > 29)
     {
       pontBuffer = 0;
     }
@@ -53,9 +71,27 @@ void serialEvent2() {
   while (Serial2.available()) {
     // get the new byte:
     char inChar = (char)Serial2.read();
-    buffercmd[pontBuffer] = inChar;
-    pontBuffer = pontBuffer + 1;
-    if (pontBuffer > 19)
+    if (inChar != ' ' )
+    {
+      pontBuffer = pontBuffer + 1;
+      buffercmd[pontBuffer] = inChar;
+    }
+    if (inChar == ':' && buffercmd[1] != 'S')
+    {
+      pontBuffer = 0;
+      buffercmd[pontBuffer] = inChar;
+    }
+    if (inChar == '#' &&  pontBuffer > 0 )
+    {
+      cmdComplete = true;
+      pontBuffer = pontBuffer + 1;
+      buffercmd[pontBuffer] = inChar;
+      memcpy(inputcmd, buffercmd, pontBuffer);
+      pontBuffer = 0;
+      buffercmd[1] = '@';
+      executecommand();
+    }
+    if (pontBuffer > 29)
     {
       pontBuffer = 0;
     }

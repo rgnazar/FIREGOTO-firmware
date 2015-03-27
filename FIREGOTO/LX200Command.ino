@@ -2,14 +2,15 @@
 
 void executecommand()
 { if (cmdComplete) {
-    Serial.println(inputcmd);
+      Serial.println("");
 
-    Serial.println("PIDalt");
-    Serial.println(PIDalt);
+          Serial.println(inputcmd);
+    /*    Serial.print("alt:");
+        Serial.println(abs(AltMotor.distanceToGo()));
 
-    Serial.println("PIDaz");
-    Serial.println(PIDaz);
-
+        Serial.print("az: ");
+        Serial.println(abs(AzMotor.distanceToGo()));
+    */
 
     if (inputcmd[0] != ':')
     {
@@ -194,9 +195,9 @@ void executecommand()
           case 'w':
             setBufferGps();
             break;
-          case 'z':
-            setPID();
-            break;
+
+
+
 
 
         }
@@ -381,19 +382,6 @@ void  setBufferGps()
   SerialPrint("1");
 }
 
-void  setPID() //:Sz00.0#
-{
-  char floatbuf[32]; // make this at least big enough for the whole string
-  String str;
-  str += inputcmd[3];
-  str += inputcmd[4];
-  str += inputcmd[5];
-  str += inputcmd[6];
-  str.toCharArray(floatbuf, sizeof(floatbuf));
-  tt  = atof(floatbuf);
-
-
-}
 
 void printSideralHora()
 {
@@ -733,6 +721,7 @@ void printSIderalRate() //Get sidereal rate RA (0 or 60Hz)	:GT# 	Reply: 0 or 60#
 
 void setRAAlvo() //:Sr03:43:56# Set target RA 	:SrHH:MM:SS# * 	Reply: 0 or 1#
 {
+      ativaacom = 0;
   String str = "";
   str += inputcmd[3];
   str += inputcmd[4];
@@ -749,12 +738,11 @@ void setRAAlvo() //:Sr03:43:56# Set target RA 	:SrHH:MM:SS# * 	Reply: 0 or 1#
   RAAlvo = Hours2DecDegrees(HH, MM, SS);
   SerialPrint("1");
 
-
-
 }
 
 void setDECAlvo() //Set target Dec 	:SdsDD:MM:SS# *	Reply: 0 or 1#
 {
+      ativaacom = 0;
   String str = "";
   str += inputcmd[4];
   str += inputcmd[5];
@@ -786,6 +774,10 @@ void synctelescope() //Sync. with current target RA/Dec	:CS#	Reply: [none]
   if ((AzAlvo >= 0) && (AltAlvo >= 0)) {
     ALTmount = (MaxPassoAlt * AltAlvo / 360.0);
     AZmount = (MaxPassoAz * AzAlvo / 360.0);
+    AZmountAlvo = AZmount;
+    ALTmountAlvo = ALTmount;
+    syncro();
+    ativaacom = 1;
   }
 
 }
@@ -799,7 +791,10 @@ void synctelescopeString() //:CM# Synchronizes the telescope position with targe
   if ((AzAlvo >= 0) && (AltAlvo >= 0)) {
     ALTmount = (MaxPassoAlt * AltAlvo / 360.0);
     AZmount = (MaxPassoAz * AzAlvo / 360.0);
-
+    AZmountAlvo = AZmount;
+    ALTmountAlvo = ALTmount;
+    syncro();
+    ativaacom = 1;
   }
 
 }
@@ -855,12 +850,10 @@ void gototeleEQAR ()// Move telescope (to current Equ target)	:MS#
     SerialPrint("1");
   }
   ativaacom = 1;
-
 }
 
 void Setsidereal() //Set sidereal rate RA (0 or 60Hz)	:STDD.D# 	Reply: [none]
 {
-  ativaacom = 1;
 }
 
 void acompanhamento()
@@ -874,73 +867,76 @@ void acompanhamento()
     ALTmountAlvo = (MaxPassoAlt * AltAlvo / 360.0);
     AZmountAlvo = (MaxPassoAz * AzAlvo / 360.0);
   }
-
 }
 
 
 void Stoptelescope () // Stop telescope 	:Q# 	Reply: [none]
 {
-
   statusmovimentacao = 0;
   paramotors();
   ativaacom = 0;
+  setaccel(1);
 }
 
 //Move telescope east (at current rate) 	:Me#	Reply: [none]
 void moveleste()
-{
-  leste = 1;
+{ setaccel(accel);
+  AzMotor.moveTo(0);
   ativaacom = 0;
 }
 
 //Move telescope west (at current rate) 	:Mw#	Reply: [none]
 void moveoeste()
-{
-  oeste = 1;
+{ setaccel(accel);
+  AzMotor.moveTo(MaxPassoAlt);
   ativaacom = 0;
 }
 
 //Move telescope north (at current rate)	:Mn#	Reply: [none]
 void movenorte()
-{
-  norte = 1;
+{ setaccel(accel);
+  AltMotor.moveTo(0);
   ativaacom = 0;
 }
 
 //Move telescope south (at current rate)	:Ms#	Reply: [none]
 void movesul()
-{
-  sul = 1;
+{ setaccel(accel);
+  AltMotor.moveTo(MaxPassoAlt / 4);
   ativaacom = 0;
 }
 
 
-void paraleste()
+void paraleste()                                 //:Qe#	Reply: [none]
 {
-
-  leste = 0;
-  calculaalvoRADECmount();
+  setaccel(1);
+  AZmount = AzMotor.currentPosition();
+  AzMotor.moveTo(AZmount);
 }
 
-//Move telescope west (at current rate) 	:Mw#	Reply: [none]
+//Move telescope west (at current rate) 	:Qw#	Reply: [none]
 void paraoeste()
+
 {
-  oeste = 0;
-  calculaalvoRADECmount();
+  setaccel(1);
+  AZmount = AzMotor.currentPosition();
+  AzMotor.moveTo(AZmount);
 }
 
-//Move telescope north (at current rate)	:Mn#	Reply: [none]
+//Move telescope north (at current rate)	:Qn#	Reply: [none]
 void paranorte()
 {
-  norte = 0;
-  calculaalvoRADECmount();
+  setaccel(1);
+  ALTmount = AltMotor.currentPosition();
+  AltMotor.moveTo(ALTmount);
 }
 
-//Move telescope south (at current rate)	:Ms#	Reply: [none]
+//Move telescope south (at current rate)	:Qs#	Reply: [none]
 void parasul()
 {
-  sul = 0;
-  calculaalvoRADECmount();
+  setaccel(1);
+  ALTmount = AltMotor.currentPosition();
+  AltMotor.moveTo(ALTmount);
 }
 
 
@@ -949,33 +945,47 @@ void parasul()
 
 void MoveRate()
 {
+  int ratepadrao = (int)(MaxPassoAz/86400);
   switch (inputcmd[2]) {
-    case '1':
-      veloc = 1;
+    case '0':
+      accel = ratepadrao*2;
       break;
-    case 'G':
-      veloc = 1;
+    case '1':
+      accel = ratepadrao*8;
       break;
     case '2':
-      veloc = 3;
-      break;
-    case 'C':
-      veloc = 3;
+      accel = ratepadrao*32;
       break;
     case '3':
-      veloc = 6;
-      break;
-    case 'M':
-      veloc = 6;
+      accel = ratepadrao*128;
       break;
     case '4':
-      veloc = 10;
+      accel = ratepadrao*512;
       break;
     case '5':
-      veloc = 12;
+      accel = ratepadrao*1024;
+      break;
+    case '6':
+      accel = ratepadrao*4096;
+      break;
+    case '7':
+      accel = ratepadrao*10000;
+      break;
+    case '8':
+      accel = ratepadrao*100000;
+      break;
+
+    case 'G':
+      accel = ratepadrao*2;
+      break;
+    case 'C':
+      accel = ratepadrao*8;
+      break;
+    case 'M':
+      accel = ratepadrao*128;
       break;
     case 'S':
-      veloc = 12;
+      accel = ratepadrao*128000;
       break;
   }
 }
