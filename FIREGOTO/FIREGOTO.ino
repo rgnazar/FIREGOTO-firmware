@@ -3,14 +3,9 @@
 #include <math.h>
 #include <Time.h>
 #include <DueTimer.h>
-
-
-
-
-//valores maximo para o encoder
+#include <DueFlashStorage.h>
 
 //Criacao dos motores
-
 
 #define MicroPassoAltpino 9
 #define MicroPassoAzpino 5
@@ -24,21 +19,45 @@ AccelStepper AzMotor(AccelStepper::DRIVER, PassoAzpino, DirAzpino);
 int accel = 1;
 
 
-//valores maximo para o passo (Valor ideal 1286400)
+/*valores maximo para o passo (Valor ideal 1286400)
 #define MaxPassoAlt 1906036  //valor de resolucao AR = Passo * MicroPasso * reducao ex(200*16*402)/4    (16*200*(117/11)*56)
 #define MaxPassoAz 1906036  //valor de resolucao AR = Passo * MicroPasso * reducao ex(200*16*402)   (16*200*(118/11)*57)
 #define MinTimer 150
-
-
-
-int veloc;
-unsigned long currentMillis, previousMillis = 0;
-int sul = 0, leste = 0, oeste = 0, norte = 0;
 // Location ----------------------------------------------------------------------------------------------------------------
 double latitude  = -25.40;
 double longitude = -49.20;
 int UTC = 0;
+setTime(22, 00, 00, 23, 03, 2014);
+*/
+
+
+DueFlashStorage dueFlashStorage;
+
+// The struct of the configuration.
+struct Configuration {
+  int32_t MaxPassoAlt;
+  int32_t MaxPassoAz;
+  int32_t MinTimer;
+  uint32_t DataHora;
+  double latitude;
+  double longitude;
+  int32_t UTC;
+  char* Local;
+};
+Configuration configuration;
+
+int MaxPassoAlt;
+int MaxPassoAz;
+int MinTimer;
+double latitude;
+double longitude;
+int UTC;
+
+
+
 int fractime;
+unsigned long currentMillis, previousMillis = 0;
+
 
 //Variaveis de controle para ler comandos LX200  ----------------------------------------------------------------------------------------------------------------
 boolean cmdComplete = false, doispontos = true; // whether the string is complete
@@ -80,12 +99,46 @@ int HorizonteLimite = 0;
 int AltitudeLimite = 90;
 
 
+
 void setup() {
-  Timer3.attachInterrupt(acionamotor);
   Serial.begin(9600);
   Serial2.begin(9600);
+
+  /* Flash is erased every time new code is uploaded. Write the default configuration to flash if first time */
+  // running for the first time?
+  uint8_t codeRunningForTheFirstTime = dueFlashStorage.read(0); // flash bytes will be 255 at first run
+  Serial.print("Primeira Execucao: ");
+  if (codeRunningForTheFirstTime) {
+    Serial.println("yes");
+    /* OK first time running, set defaults */
+    configuration.MaxPassoAlt = 1906036;
+    configuration.MaxPassoAz = 1906036;
+    configuration.MinTimer = 150;
+    configuration.latitude = -25.40;;
+    configuration.longitude = -49.20;
+    setTime(22, 00, 00, 23, 03, 2015);
+    configuration.DataHora = now();
+    configuration.UTC = 0;
+    configuration.Local = "Minha Casa";
+    // write configuration struct to flash at adress 4
+    byte b2[sizeof(Configuration)]; // create byte array to store the struct
+    memcpy(b2, &configuration, sizeof(Configuration)); // copy the struct to the byte array
+    dueFlashStorage.write(4, b2, sizeof(Configuration)); // write byte array to flash
+    // write 0 to address 0 to indicate that it is not the first time running anymore
+    dueFlashStorage.write(0, 0);
+  }
+  else {
+    Serial.println("no");
+  }
+  MaxPassoAlt = (configuration.MaxPassoAlt);
+  MaxPassoAz = (configuration.MaxPassoAz);
+  MinTimer = (configuration.MinTimer);
+  latitude = (configuration.latitude);
+  longitude = (configuration.longitude);
+  UTC = (configuration.UTC);
+  setTime(configuration.DataHora);
+  Timer3.attachInterrupt(acionamotor);
   iniciapmotores();
-  setTime(22, 00, 00, 23, 03, 2014);
   SerialPrint("00:00:00#"); //RTA para leitura do driver ASCOM da MEADE autostar I
   delay (200);
 }
@@ -93,17 +146,16 @@ void setup() {
 
 
 void loop() {
-  currentMillis = millis();  
+  currentMillis = millis();
   CalcPosicaoPasso();
-
   // print the string when a newline arrives:
   // protegemount();
   if (ativaacom != 0)
   {
-     setaccel();
-     CalcPosicaoPasso();
-     SetPosition();
-     acompanhamento();
+    setaccel();
+    CalcPosicaoPasso();
+    SetPosition();
+    acompanhamento();
   }
 }
 

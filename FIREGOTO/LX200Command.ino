@@ -2,9 +2,9 @@
 
 void executecommand()
 { if (cmdComplete) {
-      Serial.println("");
+    Serial.println("");
 
-          Serial.println(inputcmd);
+    Serial.println(inputcmd);
     /*    Serial.print("alt:");
         Serial.println(abs(AltMotor.distanceToGo()));
 
@@ -131,6 +131,26 @@ void executecommand()
             break;
         }
       }
+
+      if (inputcmd[1] == 'H') //set Hardware
+      {
+        switch (inputcmd[2]) {
+          case 'R':
+            if (inputcmd[5] == 'A')//:HRedA0000000#
+            {
+              setMaxPassoAlt();
+            }
+            else
+            {
+              setMaxPassoAz();//:HRedB0000000#
+            }
+            break;
+          case 'T':
+            setMinTimer(); //:HT0000000#
+            break;
+        }
+      }
+
       if (inputcmd[1] == 'M') {
         switch (inputcmd[2]) {
           case 'S':
@@ -151,14 +171,11 @@ void executecommand()
           case 'e':
             moveleste();
             break;
-
         }
       }
       if (inputcmd[1] == 'R') {
         MoveRate();
-
       }
-
 
       if (inputcmd[1] == 'S') {
         switch (inputcmd[2]) {
@@ -180,6 +197,9 @@ void executecommand()
           case 'L':
             setLocalHora();
             break;
+          case 'M':
+            setObservatorioNome(); // Set site 0 name 	:SMsss...#
+            break;
           case 'o':
             setHorizonteLimite();
             break;
@@ -195,11 +215,6 @@ void executecommand()
           case 'w':
             setBufferGps();
             break;
-
-
-
-
-
         }
         /*
         :U# Toggle between low/hi precision positions
@@ -293,6 +308,7 @@ void setLocalData() //:SCMM/DD/YY# Change Handbox Date to MM/DD/YY #:SC 03/20/14
   int SS = second();
   setTime(HH, MM, SS, dia, mes, ano);
   SerialPrint("1");
+  configuration.DataHora =  now();
 
 }
 
@@ -329,7 +345,7 @@ void setLocalHora()//:SLHH:MM:SS#  Set the local Time
   int tmp = UTC * (-1) * 60 * 60;
   adjustTime(tmp);
   SerialPrint("1");
-
+  configuration.DataHora =  now();
 }
 
 void PrintLocalHora()//:Get time (Local) 	:GLHH:MM:SS#	Reply: HH:MM:SS#
@@ -499,6 +515,7 @@ void setlatitude() //:StsDD*MM# Sets the current site latitude to sDD*MM# Return
   }
 
   latitude = DegMinSec2DecDeg(DD, MM, 0.0);
+  configuration.latitude = latitude;
   SerialPrint("1");
 }
 
@@ -543,6 +560,7 @@ void setlongitude() //:SgsDDD*MM# Set current site's longitude to DDD*MM an ASCI
     DD = DD * (-1);
   }
   longitude = DegMinSec2DecDeg(DD, MM, 0.0);
+  configuration.longitude = longitude;
   SerialPrint("1");
 }
 
@@ -692,7 +710,18 @@ void setHorizonteLimite() //:SoDD*# Set lowest elevation to which the telescope 
 
 void printObservatorioNome() //:GM# Get Site 1 Name Returns: <string>#
 {
-  SerialPrint("NevoeiroObservatorio#");
+  SerialPrint(configuration.Local);
+}
+
+void setObservatorioNome() // Set site 0 name 	:SMsss...# 	Reply: 0 or 1#
+{
+  String str = "";
+  int i = 4;
+  while (inputcmd[i] != '#')
+  { str += inputcmd[i];
+    i++;
+  }
+  str.toCharArray(  configuration.Local, sizeof(str));
 }
 
 
@@ -721,7 +750,7 @@ void printSIderalRate() //Get sidereal rate RA (0 or 60Hz)	:GT# 	Reply: 0 or 60#
 
 void setRAAlvo() //:Sr03:43:56# Set target RA 	:SrHH:MM:SS# * 	Reply: 0 or 1#
 {
-      ativaacom = 0;
+  ativaacom = 0;
   String str = "";
   str += inputcmd[3];
   str += inputcmd[4];
@@ -742,7 +771,7 @@ void setRAAlvo() //:Sr03:43:56# Set target RA 	:SrHH:MM:SS# * 	Reply: 0 or 1#
 
 void setDECAlvo() //Set target Dec 	:SdsDD:MM:SS# *	Reply: 0 or 1#
 {
-      ativaacom = 0;
+  ativaacom = 0;
   String str = "";
   str += inputcmd[4];
   str += inputcmd[5];
@@ -945,49 +974,92 @@ void parasul()
 
 void MoveRate()
 {
-  int ratepadrao = (int)(MaxPassoAz/86400);
+  int ratepadrao = (int)(MaxPassoAz / 86400);
   switch (inputcmd[2]) {
     case '0':
-      accel = ratepadrao*2;
+      accel = ratepadrao * 2;
       break;
     case '1':
-      accel = ratepadrao*8;
+      accel = ratepadrao * 8;
       break;
     case '2':
-      accel = ratepadrao*32;
+      accel = ratepadrao * 32;
       break;
     case '3':
-      accel = ratepadrao*128;
+      accel = ratepadrao * 128;
       break;
     case '4':
-      accel = ratepadrao*512;
+      accel = ratepadrao * 512;
       break;
     case '5':
-      accel = ratepadrao*1024;
+      accel = ratepadrao * 1024;
       break;
     case '6':
-      accel = ratepadrao*4096;
+      accel = ratepadrao * 4096;
       break;
     case '7':
-      accel = ratepadrao*10000;
+      accel = ratepadrao * 10000;
       break;
     case '8':
-      accel = ratepadrao*100000;
+      accel = ratepadrao * 100000;
       break;
 
     case 'G':
-      accel = ratepadrao*2;
+      accel = ratepadrao * 2;
       break;
     case 'C':
-      accel = ratepadrao*8;
+      accel = ratepadrao * 8;
       break;
     case 'M':
-      accel = ratepadrao*128;
+      accel = ratepadrao * 128;
       break;
     case 'S':
-      accel = ratepadrao*128000;
+      accel = ratepadrao * 128000;
       break;
   }
+
+}
+void setMaxPassoAlt()  //:HRedA0000000#
+{
+  String str = "";
+  str += inputcmd[6];
+  str += inputcmd[7];
+  str += inputcmd[8];
+  str += inputcmd[9];
+  str += inputcmd[10];
+  str += inputcmd[11];
+  str += inputcmd[12];
+  unsigned int SS = str.toInt();
+  configuration.MaxPassoAlt = SS;
+}
+
+void setMaxPassoAz() //:HRedB0000000#
+{
+  String str = "";
+  str += inputcmd[6];
+  str += inputcmd[7];
+  str += inputcmd[8];
+  str += inputcmd[9];
+  str += inputcmd[10];
+  str += inputcmd[11];
+  str += inputcmd[12];
+  unsigned int SS = str.toInt();
+  configuration.MaxPassoAz = SS;
+}
+
+void setMinTimer() //:HT0000000#
+{
+  String str = "";
+  str += inputcmd[6];
+  str += inputcmd[7];
+  str += inputcmd[8];
+  str += inputcmd[9];
+  str += inputcmd[10];
+  str += inputcmd[11];
+  str += inputcmd[12];
+  unsigned int SS = str.toInt();
+  configuration.MinTimer = SS;
+
 }
 
 
