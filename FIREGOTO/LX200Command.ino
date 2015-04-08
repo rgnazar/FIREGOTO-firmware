@@ -135,18 +135,34 @@ void executecommand()
       if (inputcmd[1] == 'H') //set Hardware
       {
         switch (inputcmd[2]) {
-          case 'R':
-            if (inputcmd[5] == 'A')//:HRedA0000000#
+          case 'S':
+            if (inputcmd[4] == 'A')//:HSRA0000000#
             {
               setMaxPassoAlt();
             }
-            else
+            if (inputcmd[4] == 'B')//:HSRB0000000#
             {
-              setMaxPassoAz();//:HRedB0000000#
+              setMaxPassoAz();//:HSRB0000000#
+            }
+            if (inputcmd[3] == 'T')//:HST0000000#
+            {
+              setMinTimer(); //:HST0000000#
             }
             break;
-          case 'T':
-            setMinTimer(); //:HT0000000#
+
+          case 'G':
+            if (inputcmd[4] == 'A')//:HGRA0000000#
+            {
+              getMaxPassoAlt();
+            }
+            if (inputcmd[4] == 'B')//:HGRB0000000#
+            {
+              getMaxPassoAz();//:HGRB0000000#
+            }
+            if (inputcmd[3] == 'T')//:HGT0000000#
+            {
+              getMinTimer(); //:HGT0000000#
+            }
             break;
         }
       }
@@ -1019,7 +1035,8 @@ void MoveRate()
   }
 
 }
-void setMaxPassoAlt()  //:HRedA0000000#
+
+void setMaxPassoAlt()  //:HSRA0000000#
 {
   String str = "";
   str += inputcmd[6];
@@ -1031,9 +1048,10 @@ void setMaxPassoAlt()  //:HRedA0000000#
   str += inputcmd[12];
   unsigned int SS = str.toInt();
   configuration.MaxPassoAlt = SS;
+    MaxPassoAlt = (configuration.MaxPassoAlt);
 }
 
-void setMaxPassoAz() //:HRedB0000000#
+void setMaxPassoAz() //:HSRB0000000#
 {
   String str = "";
   str += inputcmd[6];
@@ -1045,9 +1063,10 @@ void setMaxPassoAz() //:HRedB0000000#
   str += inputcmd[12];
   unsigned int SS = str.toInt();
   configuration.MaxPassoAz = SS;
+  MaxPassoAz = (configuration.MaxPassoAz);
 }
 
-void setMinTimer() //:HT0000000#
+void setMinTimer() //:HST0000000#
 {
   String str = "";
   str += inputcmd[6];
@@ -1059,7 +1078,29 @@ void setMinTimer() //:HT0000000#
   str += inputcmd[12];
   unsigned int SS = str.toInt();
   configuration.MinTimer = SS;
+  MinTimer = (configuration.MinTimer);
 
+}
+
+void getMaxPassoAlt()  //:HGRA#
+{
+  char str[8];
+  sprintf(str, "%07d#", int(MaxPassoAlt));
+  SerialPrint(str);
+}
+
+void getMaxPassoAz() //:HGRB#
+{
+  char str[8];
+  sprintf(str, "%07d#", int(MaxPassoAz));
+  SerialPrint(str);
+}
+
+void getMinTimer() //:HGT#
+{
+  char str[8];
+  sprintf(str, "%07d#", int(MinTimer));
+  SerialPrint(str);
 }
 
 
