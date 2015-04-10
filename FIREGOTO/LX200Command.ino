@@ -148,17 +148,17 @@ void executecommand()
             break;
 
           case 'G':
-            if (inputcmd[4] == 'A')//:HGRA0000000#
+            if (inputcmd[4] == 'A')//:HGRA#
             {
               getMaxPassoAlt();
             }
-            if (inputcmd[4] == 'B')//:HGRB0000000#
+            if (inputcmd[4] == 'B')//:HGRB#
             {
-              getMaxPassoAz();//:HGRB0000000#
+              getMaxPassoAz();//:HGRB#
             }
-            if (inputcmd[3] == 'T')//:HGT0000000#
+            if (inputcmd[3] == 'T')//:HGT#
             {
-              getMinTimer(); //:HGT0000000#
+              getMinTimer(); //:HGT#
             }
             break;
         }
