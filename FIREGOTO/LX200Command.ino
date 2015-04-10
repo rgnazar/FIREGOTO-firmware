@@ -1063,6 +1063,8 @@ void setMaxPassoAlt()  //:HSRA0000000#
   byte b2[sizeof(Configuration)]; // create byte array to store the struct
   memcpy(b2, &configurationFromFlash, sizeof(Configuration)); // copy the struct to the byte array
   dueFlashStorage.write(4, b2, sizeof(Configuration)); // write byte array to flash
+  SerialPrint("1");
+
 }
 
 void setMaxPassoAz() //:HSRB0000000#
@@ -1081,6 +1083,8 @@ void setMaxPassoAz() //:HSRB0000000#
   byte b2[sizeof(Configuration)]; // create byte array to store the struct
   memcpy(b2, &configurationFromFlash, sizeof(Configuration)); // copy the struct to the byte array
   dueFlashStorage.write(4, b2, sizeof(Configuration)); // write byte array to flash
+  SerialPrint("1");
+
 }
 
 void setMinTimer() //:HST0000000#
@@ -1094,11 +1098,13 @@ void setMinTimer() //:HST0000000#
   str += inputcmd[11];
   str += inputcmd[12];
   unsigned int SS = str.toInt();
-  configurationFromFlash.MinTimer = SS;
-  MinTimer = configurationFromFlash.MinTimer;
+  configurationFromFlash.MinTimer = SS + 150;
+  MinTimer = configurationFromFlash.MinTimer ;  //valor minimo
   byte b2[sizeof(Configuration)]; // create byte array to store the struct
   memcpy(b2, &configurationFromFlash, sizeof(Configuration)); // copy the struct to the byte array
   dueFlashStorage.write(4, b2, sizeof(Configuration)); // write byte array to flash
+  SerialPrint("1");
+
 
 }
 
