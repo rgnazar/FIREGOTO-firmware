@@ -32,9 +32,6 @@ void executecommand()
       }
     }
     if (cmdComplete) {
-      if (inputcmd[1] == 'H') {
-        printHelp();
-      }
       if (inputcmd[1] == '$') {
         switch (inputcmd[2]) {
           case 'B':
@@ -324,7 +321,11 @@ void setLocalData() //:SCMM/DD/YY# Change Handbox Date to MM/DD/YY #:SC 03/20/14
   int SS = second();
   setTime(HH, MM, SS, dia, mes, ano);
   SerialPrint("1");
-  configuration.DataHora =  now();
+  configurationFromFlash.DataHora =  now();
+  byte b2[sizeof(Configuration)]; // create byte array to store the struct
+  memcpy(b2, &configurationFromFlash, sizeof(Configuration)); // copy the struct to the byte array
+  dueFlashStorage.write(4, b2, sizeof(Configuration)); // write byte array to flash
+
 
 }
 
@@ -361,7 +362,10 @@ void setLocalHora()//:SLHH:MM:SS#  Set the local Time
   int tmp = UTC * (-1) * 60 * 60;
   adjustTime(tmp);
   SerialPrint("1");
-  configuration.DataHora =  now();
+  configurationFromFlash.DataHora =  now();
+  byte b2[sizeof(Configuration)]; // create byte array to store the struct
+  memcpy(b2, &configurationFromFlash, sizeof(Configuration)); // copy the struct to the byte array
+  dueFlashStorage.write(4, b2, sizeof(Configuration)); // write byte array to flash
 }
 
 void PrintLocalHora()//:Get time (Local) 	:GLHH:MM:SS#	Reply: HH:MM:SS#
@@ -531,8 +535,11 @@ void setlatitude() //:StsDD*MM# Sets the current site latitude to sDD*MM# Return
   }
 
   latitude = DegMinSec2DecDeg(DD, MM, 0.0);
-  configuration.latitude = latitude;
+  configurationFromFlash.latitude = latitude;
   SerialPrint("1");
+  byte b2[sizeof(Configuration)]; // create byte array to store the struct
+  memcpy(b2, &configurationFromFlash, sizeof(Configuration)); // copy the struct to the byte array
+  dueFlashStorage.write(4, b2, sizeof(Configuration)); // write byte array to flash
 }
 
 void printlatitude()// :Gt# Get Current Site Latitude Returns: sDD*MM# The latitude of the current site. Positive inplies North latitude.
@@ -576,8 +583,11 @@ void setlongitude() //:SgsDDD*MM# Set current site's longitude to DDD*MM an ASCI
     DD = DD * (-1);
   }
   longitude = DegMinSec2DecDeg(DD, MM, 0.0);
-  configuration.longitude = longitude;
+  configurationFromFlash.longitude = longitude;
   SerialPrint("1");
+  byte b2[sizeof(Configuration)]; // create byte array to store the struct
+  memcpy(b2, &configurationFromFlash, sizeof(Configuration)); // copy the struct to the byte array
+  dueFlashStorage.write(4, b2, sizeof(Configuration)); // write byte array to flash
 }
 
 void printlongitude() // Get Current Site Longitude Returns: sDDD*MM#
@@ -1039,31 +1049,38 @@ void MoveRate()
 void setMaxPassoAlt()  //:HSRA0000000#
 {
   String str = "";
+  str += inputcmd[5];
   str += inputcmd[6];
   str += inputcmd[7];
   str += inputcmd[8];
   str += inputcmd[9];
   str += inputcmd[10];
   str += inputcmd[11];
-  str += inputcmd[12];
   unsigned int SS = str.toInt();
-  configuration.MaxPassoAlt = SS;
-    MaxPassoAlt = (configuration.MaxPassoAlt);
+  configurationFromFlash.MaxPassoAlt = SS;
+  MaxPassoAlt = configurationFromFlash.MaxPassoAlt;
+  // write configuration struct to flash at adress 4
+  byte b2[sizeof(Configuration)]; // create byte array to store the struct
+  memcpy(b2, &configurationFromFlash, sizeof(Configuration)); // copy the struct to the byte array
+  dueFlashStorage.write(4, b2, sizeof(Configuration)); // write byte array to flash
 }
 
 void setMaxPassoAz() //:HSRB0000000#
 {
   String str = "";
+  str += inputcmd[5];
   str += inputcmd[6];
   str += inputcmd[7];
   str += inputcmd[8];
   str += inputcmd[9];
   str += inputcmd[10];
   str += inputcmd[11];
-  str += inputcmd[12];
   unsigned int SS = str.toInt();
-  configuration.MaxPassoAz = SS;
-  MaxPassoAz = (configuration.MaxPassoAz);
+  configurationFromFlash.MaxPassoAz = SS;
+  MaxPassoAz = configurationFromFlash.MaxPassoAz;
+  byte b2[sizeof(Configuration)]; // create byte array to store the struct
+  memcpy(b2, &configurationFromFlash, sizeof(Configuration)); // copy the struct to the byte array
+  dueFlashStorage.write(4, b2, sizeof(Configuration)); // write byte array to flash
 }
 
 void setMinTimer() //:HST0000000#
@@ -1077,8 +1094,11 @@ void setMinTimer() //:HST0000000#
   str += inputcmd[11];
   str += inputcmd[12];
   unsigned int SS = str.toInt();
-  configuration.MinTimer = SS;
-  MinTimer = (configuration.MinTimer);
+  configurationFromFlash.MinTimer = SS;
+  MinTimer = configurationFromFlash.MinTimer;
+  byte b2[sizeof(Configuration)]; // create byte array to store the struct
+  memcpy(b2, &configurationFromFlash, sizeof(Configuration)); // copy the struct to the byte array
+  dueFlashStorage.write(4, b2, sizeof(Configuration)); // write byte array to flash
 
 }
 

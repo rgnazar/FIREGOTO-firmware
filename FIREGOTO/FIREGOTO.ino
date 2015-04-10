@@ -45,6 +45,8 @@ struct Configuration {
   char* Local;
 };
 Configuration configuration;
+Configuration configurationFromFlash; // create a temporary struct
+
 
 int MaxPassoAlt;
 int MaxPassoAz;
@@ -130,13 +132,18 @@ void setup() {
   else {
     Serial.println("no");
   }
-  MaxPassoAlt = (configuration.MaxPassoAlt);
-  MaxPassoAz = (configuration.MaxPassoAz);
-  MinTimer = (configuration.MinTimer);
-  latitude = (configuration.latitude);
-  longitude = (configuration.longitude);
-  UTC = (configuration.UTC);
-  setTime(configuration.DataHora);
+  byte* b = dueFlashStorage.readAddress(4); // byte array which is read from flash at adress 4
+  memcpy(&configurationFromFlash, b, sizeof(Configuration)); // copy byte array to temporary struct
+  MaxPassoAlt = configurationFromFlash.MaxPassoAlt;
+  MaxPassoAz = configurationFromFlash.MaxPassoAz;
+  MinTimer = configurationFromFlash.MinTimer;
+  latitude = configurationFromFlash.latitude;
+  longitude = configurationFromFlash.longitude;
+  UTC = configurationFromFlash.UTC;
+  setTime(configurationFromFlash.DataHora);
+
+
+
   Timer3.attachInterrupt(acionamotor);
   iniciapmotores();
   SerialPrint("00:00:00#"); //RTA para leitura do driver ASCOM da MEADE autostar I
