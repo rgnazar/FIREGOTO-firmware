@@ -58,7 +58,7 @@ int UTC;
 
 
 int fractime;
-unsigned long currentMillis, previousMillis = 0;
+unsigned long currentMillis, previousMillis, PCommadMillis, calculaRADECmountMillis = 0;
 
 
 //Variaveis de controle para ler comandos LX200  ----------------------------------------------------------------------------------------------------------------
@@ -75,9 +75,14 @@ int numCommand = 0;
 double SideralRate = 60.0; //HZ
 int RAbacklash = 0; //(in ArcSec)
 int DECbacklash = 0; //(in ArcSec)
-//Variaveis globais de posição fisica do telescopio  ----------------------------------------------------------------------------------------------------------------
+int AtivaBack = 1;
+int dirAlt, dirAz, dirAltant, dirAzant;
+
+//Variaveis globais de posiÃ§Ã£o fisica do telescopio  ----------------------------------------------------------------------------------------------------------------
 double eixoAltGrausDecimal = 0.0;
 double eixoAzGrausDecimal = 0.0;
+double ResolucaoeixoAltGrausDecimal = 0.0;
+double ResolucaoeixoAzGrausDecimal = 0.0;
 double RAmount = 0.0;
 double DECmount = 0.0;
 double AZmount = 0.0;
@@ -93,12 +98,20 @@ double RAAlvo = 0.0;
 double DECAlvo = 0.0;
 double AzAlvo = 0.0;
 double AltAlvo = 0.0;
+double ErroAlt = 0.0;
+double ErroAz = 0.0;
+
+
 int statusmovimentacao = 0;
 int ativaacom = 0;
 int gotomount = 0;
 //limites da montagem
 int HorizonteLimite = 0;
 int AltitudeLimite = 90;
+
+//Ajuste fino do tempo
+int Segundo;
+double Microssegundo = 0 , SegundoFracao = 0.0, MilissegundoSeg = 0.0, MilissegundoI = 0.0;
 
 
 
@@ -113,12 +126,13 @@ void setup() {
   if (codeRunningForTheFirstTime) {
     Serial.println("yes");
     /* OK first time running, set defaults */
-    configuration.MaxPassoAlt = 1906036;
-    configuration.MaxPassoAz = 1906036;
-    configuration.MinTimer = 150;
+    configuration.MaxPassoAlt = 1856000;
+    configuration.MaxPassoAz = 1856000;
+    configuration.MinTimer = 180;
     configuration.latitude = -25.40;;
     configuration.longitude = -49.20;
     setTime(22, 00, 00, 23, 03, 2015);
+    MilissegundoSeg = second();
     configuration.DataHora = now();
     configuration.UTC = 0;
     configuration.Local = "Minha Casa";
@@ -141,13 +155,14 @@ void setup() {
   longitude = configurationFromFlash.longitude;
   UTC = configurationFromFlash.UTC;
   setTime(configurationFromFlash.DataHora);
-
-
-
-  Timer3.attachInterrupt(acionamotor);
   iniciapmotores();
   SerialPrint("00:00:00#"); //RTA para leitura do driver ASCOM da MEADE autostar I
   delay (200);
+  previousMillis = millis();
+  PCommadMillis = previousMillis;
+  ErroAlt = ErroAz = 44.0;
+  ResolucaoeixoAltGrausDecimal = 360.0 / MaxPassoAlt ;
+  ResolucaoeixoAzGrausDecimal = 360.0 / MaxPassoAz ;
 }
 
 
@@ -155,16 +170,41 @@ void setup() {
 void loop() {
   currentMillis = millis();
   CalcPosicaoPasso();
+  if (PCommadMillis < currentMillis)
+  {
+    PrintLocalHora();
+    Serial.println(String(Hora2DecHora(hour(), minute(), SegundoFracao), 10)) ;
+    PCommadMillis = PCommadMillis + 1497;
+  }
+
+  if (calculaRADECmountMillis < currentMillis)
+  {
+    calculaRADECmountMillis = calculaRADECmountMillis + 500;
+    calculaRADECmount();
+  }
+
+
+
   // print the string when a newline arrives:
   // protegemount();
   if (ativaacom != 0)
   {
-    setaccel();
-    CalcPosicaoPasso();
+    if (previousMillis < currentMillis)
+    {
+      setaccel();
+      previousMillis = previousMillis + 200;
+    }
     SetPosition();
     acompanhamento();
   }
+  else
+  {
+    previousMillis = millis();
+  }
+
+
 }
+
 
 
 

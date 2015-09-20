@@ -5,7 +5,7 @@
 *
 * \return double.
 */
-String readString; //armazena informaÃ§Ãµes mesmo com acompanhamento ativo
+String readString; //armazena informaÃƒÂ§ÃƒÂµes mesmo com acompanhamento ativo
 char informacao;
 char posicao;
 
@@ -138,7 +138,7 @@ double modulo(double digits) {
   return (digits);
 }
 
-int LeHHMMSS(int *HH, int *MM, int *SS) //Pede e LÃŠ Hora MM SS
+int LeHHMMSS(int *HH, int *MM, int *SS) //Pede e LÃƒÅ  Hora MM SS
 { char fim = 0;
   if (posicao == 0)
   {
@@ -202,7 +202,7 @@ int LeHHMMSS(int *HH, int *MM, int *SS) //Pede e LÃŠ Hora MM SS
   }
 }
 
-int LeGGMMSS(int *GG, int *MM, int *SS) //Pede e LÃŠ Grau MM SS
+int LeGGMMSS(int *GG, int *MM, int *SS) //Pede e LÃƒÅ  Grau MM SS
 {
   if (posicao == 0)
   {
@@ -251,16 +251,16 @@ int LeGGMMSS(int *GG, int *MM, int *SS) //Pede e LÃŠ Grau MM SS
 }
 
 
-int LeHHDD(int *HH, int *DD) //Pede e LÃŠ Hora e fraÃ§Ã£o decimal da hora
+int LeHHDD(int *HH, int *DD) //Pede e LÃƒÅ  Hora e fraÃƒÂ§ÃƒÂ£o decimal da hora
 {
 }
 
-int LeGGDD(int *GG, int *DD) //Pede e LÃŠ Grau e fraÃ§Ã£o decimal de Grau
+int LeGGDD(int *GG, int *DD) //Pede e LÃƒÅ  Grau e fraÃƒÂ§ÃƒÂ£o decimal de Grau
 {
 }
 
 
-int LeGGDD(int *DD, int *MM, int *AAAA) //Pede e LÃŠ Grau e fraÃ§Ã£o decimal de Grau
+int LeGGDD(int *DD, int *MM, int *AAAA) //Pede e LÃƒÅ  Grau e fraÃƒÂ§ÃƒÂ£o decimal de Grau
 {
   if (posicao == 0)
   {
@@ -323,6 +323,7 @@ int LeSinal()
     }
   }
 }
+
 
 
 

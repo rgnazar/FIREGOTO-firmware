@@ -16,13 +16,20 @@ void iniciapmotores()
   AltMotor.setAcceleration(5000.0);
   AzMotor.setMaxSpeed(20000.0);
   AzMotor.setAcceleration(5000.0);
+  Timer3.attachInterrupt(acionamotor);
   Timer3.start(MinTimer);
+
+
+
 }
 
 void setaccel()
 {
-  AltMotor.setMaxSpeed(abs(AltMotor.distanceToGo() / 2) + 1);
-  AzMotor.setMaxSpeed(abs(AzMotor.distanceToGo() / 2) + 1);
+  double tempdis;
+  tempdis = abs(AzMotor.distanceToGo());
+  AzMotor.setMaxSpeed(tempdis / 10 * tempdis / 10 );
+  tempdis = abs(AltMotor.distanceToGo());
+  AltMotor.setMaxSpeed(tempdis / 10 * tempdis / 10 );
 }
 
 void setaccel(int Accel)
@@ -31,6 +38,52 @@ void setaccel(int Accel)
   AzMotor.setMaxSpeed(Accel);
 }
 
+void addbackslash()
+{
+  if (AzMotor.distanceToGo() >= 0)
+  {
+    dirAz = 1;
+  } else {
+    dirAz = 0;
+  }
+  if (AltMotor.distanceToGo() >= 0)
+  {
+    dirAlt = 1;
+  } else {
+    dirAlt = 0;
+  }
+  if (AtivaBack == 1)
+  {
+    AtivaBack = 0;
+    if (dirAlt != dirAltant)
+    {
+      if (dirAlt == 0)
+      {
+        Serial.println("alt:0");
+        AltMotor.setCurrentPosition(AltMotor.currentPosition() + RAbacklash);
+      } else
+      {
+        AltMotor.setCurrentPosition(AltMotor.currentPosition() - RAbacklash);
+        Serial.println("alt:1");
+
+      }
+    }
+    if (dirAz != dirAzant)
+    {
+      if (dirAz == 0)
+      {
+        AzMotor.setCurrentPosition( AzMotor.currentPosition() + DECbacklash);
+        Serial.println("az: 0 ");
+
+      } else
+      {
+        AzMotor.setCurrentPosition( AzMotor.currentPosition() - DECbacklash);
+        Serial.println("az: 1");
+
+      }
+    }
+  }
+}
 
 
 void syncro()
@@ -49,6 +102,23 @@ void SetPosition()
 void acionamotor() {
   AltMotor.run();
   AzMotor.run();
+  //Cria MicroSeg Virtusal
+  Segundo = second();
+  if (MilissegundoSeg == Segundo)
+  {
+    Microssegundo =  Microssegundo + MinTimer;
+    if (Microssegundo > 999999)
+    {
+      Microssegundo = 999999;
+    }
+    SegundoFracao = Microssegundo * 0.000001;
+   SegundoFracao = SegundoFracao + Segundo;
+  }
+  else
+  {
+    MilissegundoSeg = Segundo;
+    Microssegundo = 1;
+  }
 }
 
 
@@ -60,15 +130,15 @@ int paramotors()
   return (1);
 }
 
-void  CalcPosicaoPasso()
+void CalcPosicaoPasso()
 {
   ALTmount = AltMotor.currentPosition();
   AZmount = AzMotor.currentPosition();
-  eixoAltGrausDecimal = 360.0 / MaxPassoAlt * ALTmount;
-  eixoAzGrausDecimal = 360.0 / MaxPassoAz * AZmount;
+  eixoAltGrausDecimal = ResolucaoeixoAltGrausDecimal * ALTmount;
+  eixoAzGrausDecimal = ResolucaoeixoAzGrausDecimal * AZmount;
 }
 
-void  protegemount()
+void protegemount()
 {
   if ((eixoAltGrausDecimal < 1 ) || (eixoAltGrausDecimal > 90))
   {
@@ -83,7 +153,5 @@ void  protegemount()
     ativaacom = 0;
   }
 }
-
-
 
 

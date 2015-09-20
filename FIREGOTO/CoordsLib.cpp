@@ -217,3 +217,4 @@ void CoordsLib::getECoords(float ac, float alt, float t, float *ar, float *dec) 
   (*ar) = atan2(EVC[1], EVC[0]) + (_k * (t - _t0));
   (*dec) = asin(EVC[2]);
 }
+

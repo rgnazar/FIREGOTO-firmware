@@ -149,7 +149,7 @@ class CoordsLib {
      *
      * Calculates the cross product of the two first reference objects in both coordinates systems, in order
      * to obtain the third one.
-     * These two first objects must have 90º from each other, approximately (from 60º to 120º is enough to obtain
+     * These two first objects must have 90Âº from each other, approximately (from 60Âº to 120Âº is enough to obtain
      * goods results).
      */
     void autoRef_3();
@@ -178,3 +178,4 @@ class CoordsLib {
 };
 
 #endif
+

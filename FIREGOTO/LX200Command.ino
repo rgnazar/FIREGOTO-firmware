@@ -2,16 +2,10 @@
 
 void executecommand()
 { if (cmdComplete) {
+    PCommadMillis = currentMillis + 5000;
     Serial.println("");
-
     Serial.println(inputcmd);
-    /*    Serial.print("alt:");
-        Serial.println(abs(AltMotor.distanceToGo()));
-
-        Serial.print("az: ");
-        Serial.println(abs(AzMotor.distanceToGo()));
-    */
-
+    addbackslash();
     if (inputcmd[0] != ':')
     {
       if (inputcmd[0] == 0x06)
@@ -186,6 +180,11 @@ void executecommand()
             break;
         }
       }
+      /* Set rate to Guide 	:RG# 	Reply: [none]
+      Set rate to Centering 	:RC# 	Reply: [none]
+      Set rate to Move 	:RM# 	Reply: [none]
+      Set rate to Slew 	:RS# 	Reply: [none]
+      Set rate to n (1-9)*3	:Rn# 	Reply: [none]   */
       if (inputcmd[1] == 'R') {
         MoveRate();
       }
@@ -236,7 +235,7 @@ void executecommand()
         Returns Nothing */
       }
       if (inputcmd[1] == 'U') {
-        SerialPrint("u");
+        SerialPrint("00:00:00#");
       }
 
       if (inputcmd[1] == 'Q') {
@@ -256,6 +255,8 @@ void executecommand()
             break;
         }
       }
+
+
     }
     delay(1);
   }
@@ -325,8 +326,6 @@ void setLocalData() //:SCMM/DD/YY# Change Handbox Date to MM/DD/YY #:SC 03/20/14
   byte b2[sizeof(Configuration)]; // create byte array to store the struct
   memcpy(b2, &configurationFromFlash, sizeof(Configuration)); // copy the struct to the byte array
   dueFlashStorage.write(4, b2, sizeof(Configuration)); // write byte array to flash
-
-
 }
 
 void printDataLocal() //Get date 	:GC# 	 Reply: MM/DD/YY#
@@ -359,7 +358,7 @@ void setLocalHora()//:SLHH:MM:SS#  Set the local Time
   int mes = month();
   int ano = year();
   setTime(HH, MM, SS, dia, mes, ano);
-  int tmp = UTC * (-1) * 60 * 60;
+  int tmp = UTC * 60 * 60;
   adjustTime(tmp);
   SerialPrint("1");
   configurationFromFlash.DataHora =  now();
@@ -370,7 +369,7 @@ void setLocalHora()//:SLHH:MM:SS#  Set the local Time
 
 void PrintLocalHora()//:Get time (Local) 	:GLHH:MM:SS#	Reply: HH:MM:SS#
 {
-  int hhl = int(hour() + UTC);
+  int hhl = int(hour());
 
 
   if (hhl > 23)
@@ -475,7 +474,6 @@ void printALTmount() //:GA# Get Telescope Altitude Returns: sDD*MM# or sDD*MM'SS
 
 void printRAmount() //:GR# Get Telescope RA Returns: HH:MM.T# or HH:MM:SS#
 {
-  calculaRADECmount();
   int tmp = DecDeg2HoursHH(RAmount);
   if (tmp < 10) {
     SerialPrint("0");
@@ -500,7 +498,6 @@ void printRAmount() //:GR# Get Telescope RA Returns: HH:MM.T# or HH:MM:SS#
 
 void printDECmount() //:GD# Get Telescope Declination. Returns: sDD*MM# or sDD*MM'SS#
 {
-  calculaRADECmount();
   int Ddeg = abs((int)DecDegtoDeg(DECmount));
   int Min = abs((int)DecDegtoMin(DECmount));
   int Sec = abs((int)DecDegtoSec(DECmount));
@@ -517,7 +514,7 @@ void printDECmount() //:GD# Get Telescope Declination. Returns: sDD*MM# or sDD*M
 
 }
 
-void setlatitude() //:StsDD*MM# Sets the current site latitude to sDD*MM# Returns: 0 Ã¢â‚¬â€œ Invalid 1 - Valid
+void setlatitude() //:StsDD*MM# Sets the current site latitude to sDD*MM# Returns: 0 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Invalid 1 - Valid
 {
 
   String str = "";
@@ -565,8 +562,8 @@ void printlatitude()// :Gt# Get Current Site Latitude Returns: sDD*MM# The latit
 
 }
 
-void setlongitude() //:SgsDDD*MM# Set current site's longitude to DDD*MM an ASCII position string Returns: 0 Ã¢â‚¬â€œ Invalid 1 - Valid
-//NO PROTOCOLO DA MEADE O SINAL Ãˆ AO CONTRARIO
+void setlongitude() //:SgsDDD*MM# Set current site's longitude to DDD*MM an ASCII position string Returns: 0 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Invalid 1 - Valid
+//NO PROTOCOLO DA MEADE O SINAL ÃƒË† AO CONTRARIO
 {
   String str = "";
   str += inputcmd[4];
@@ -618,7 +615,7 @@ void printlongitude() // Get Current Site Longitude Returns: sDDD*MM#
 }
 
 void calculaAZALTmount() {
-  double horadec = Hora2DecHora(hour(), minute(), second()) ;
+  double horadec = Hora2DecHora(hour(), minute(), SegundoFracao) ;
   double jdia = JulianoDay (year(), month(), day(), horadec) ;
   double HST = HoraSideral(jdia);
   double HSL = HoraSiderallocal(longitude, HST) ;
@@ -628,7 +625,8 @@ void calculaAZALTmount() {
 
 
 void calculaRADECmount() {
-  double horadec = Hora2DecHora(hour(), minute(), second()) ;
+
+  double horadec = Hora2DecHora(hour(), minute(), SegundoFracao) ;
   double jdia = JulianoDay (year(), month(), day(), horadec) ;
   double HST = HoraSideral(jdia);
   double HSL = HoraSiderallocal(longitude, HST) ;
@@ -636,7 +634,7 @@ void calculaRADECmount() {
 }
 
 void calculaalvoRADECmount() {
-  double horadec = Hora2DecHora(hour(), minute(), second()) ;
+  double horadec = Hora2DecHora(hour(), minute(), SegundoFracao) ;
   double jdia = JulianoDay (year(), month(), day(), horadec) ;
   double HST = HoraSideral(jdia);
   double HSL = HoraSiderallocal(longitude, HST) ;
@@ -821,7 +819,7 @@ void setDECAlvo() //Set target Dec 	:SdsDD:MM:SS# *	Reply: 0 or 1#
 
 void synctelescope() //Sync. with current target RA/Dec	:CS#	Reply: [none]
 {
-  double horadec = Hora2DecHora(hour(), minute(), second()) ;
+  double horadec = Hora2DecHora(hour(), minute(), SegundoFracao) ;
   double jdia = JulianoDay (year(), month(), day(), horadec) ;
   double HST = HoraSideral(jdia);
   double HSL = HoraSiderallocal(longitude, HST) ;
@@ -838,7 +836,7 @@ void synctelescope() //Sync. with current target RA/Dec	:CS#	Reply: [none]
 }
 void synctelescopeString() //:CM# Synchronizes the telescope position with target. Returns static string: " M31 EX GAL MAG 3.5 SZ178.0'#", or "#" if error.
 {
-  double horadec = Hora2DecHora(hour(), minute(), second()) ;
+  double horadec = Hora2DecHora(hour(), minute(), SegundoFracao) ;
   double jdia = JulianoDay (year(), month(), day(), horadec) ;
   double HST = HoraSideral(jdia);
   double HSL = HoraSiderallocal(longitude, HST) ;
@@ -850,6 +848,7 @@ void synctelescopeString() //:CM# Synchronizes the telescope position with targe
     ALTmountAlvo = ALTmount;
     syncro();
     ativaacom = 1;
+    printRAmount();
   }
 
 }
@@ -890,8 +889,7 @@ void setDECbacklash ()// Set Dec backlash amount (in ArcSec)	:$BDnnn#	Reply: 0 o
 
 }
 void gototeleEQAR ()// Move telescope (to current Equ target)	:MS#
-{
-  double horadec = Hora2DecHora(hour(), minute(), second()) ;
+{ double horadec = Hora2DecHora(hour(), minute(), SegundoFracao) ;
   double jdia = JulianoDay (year(), month(), day(), horadec) ;
   double HST = HoraSideral(jdia);
   double HSL = HoraSiderallocal(longitude, HST) ;
@@ -899,6 +897,11 @@ void gototeleEQAR ()// Move telescope (to current Equ target)	:MS#
   if ((AzAlvo >= 0) && (AltAlvo >= 0)) {
     ALTmountAlvo = (MaxPassoAlt * AltAlvo / 360.0);
     AZmountAlvo = (MaxPassoAz * AzAlvo / 360.0);
+
+    dirAltant = dirAlt;
+    dirAzant = dirAz;
+    AtivaBack = 1;
+
     SerialPrint("0");
   } else
   {
@@ -912,8 +915,7 @@ void Setsidereal() //Set sidereal rate RA (0 or 60Hz)	:STDD.D# 	Reply: [none]
 }
 
 void acompanhamento()
-{
-  double horadec = Hora2DecHora(hour(), minute(), second()) ;
+{ double horadec = Hora2DecHora(hour(), minute(), SegundoFracao) ;
   double jdia = JulianoDay (year(), month(), day(), horadec) ;
   double HST = HoraSideral(jdia);
   double HSL = HoraSiderallocal(longitude, HST) ;
@@ -1301,5 +1303,6 @@ N-Not slewing, H-At Home position,
 P-Parked, p-Not parked, F-Park Failed,
 I-park In progress, R-PEC Recorded 	:GU# 	Reply: sss#
 */
+
 
 

@@ -9,16 +9,21 @@ void Azalt2Radec(double latitude, double longitude, double az, double el, double
   *dec = RadianstoDegrees(*dec);
   double sdec = sin(DegreestoRadians (*dec));
   double cdec = cos(DegreestoRadians (*dec));
-  double ha = atan2( -saz * cel , - slat * caz * cel + sel * clat);
+  //double ha = atan2( -saz * cel , - slat * caz * cel + sel * clat);
 
   double LHA = atan2(-saz * cel / cdec, (sel - sdec * slat) / (cdec * clat)) * (180 / PI);
   double x = horaSiderallocal - LHA;
+
   //mod(x,y)= x-x*int(x/y)
   //RA = mod(ThetaLST-LHA,360);
+  if (x >= 360) {
+    x = x - 360;
+  }
   *ra = x - x * (int)(x / 360);
   if (*ra < 0) {
     *ra = *ra + 360;
   }
+
 }
 
 
@@ -65,13 +70,12 @@ double JulianoDay (double y, double m, double d, double decH) {
 
 //converte Hora em HoraDecimal
 double  Hora2DecHora(double h, double mins, double ss) {
-  fractime = millis() % 1000;
-  return (h + (mins / 60.0) + (ss / 60.0 / 60.0) + fractime / 1001);
+  return (h + (mins / 60.0) + (ss / 60.0 / 60.0));
 }
 
 
 
-// Convert Degrees, Minutes, Seconds to Decimal Degrees Input -30Ã‚Â°02'53'' - -30, 02, 53
+// Convert Degrees, Minutes, Seconds to Decimal Degrees Input -30Ãƒâ€šÃ‚Â°02'53'' - -30, 02, 53
 double DegMinSec2DecDeg(double GG, double MM, double SS) {
   if (GG < 0) {
     MM = 0 - MM;
@@ -189,6 +193,7 @@ int DecHour2HoursSEC(double hDecHour) {
   return ((int)secs);
 
 }
+
 
 
 
