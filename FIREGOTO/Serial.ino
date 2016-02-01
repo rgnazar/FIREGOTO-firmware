@@ -34,7 +34,7 @@
 void SerialPrint(String str)
 {
   Serial.print(str);
-  Serial2.print(str);
+  Serial3.print(str);
 }
 
 void serialEvent() {
@@ -67,10 +67,10 @@ void serialEvent() {
     }
   }
 }
-void serialEvent2() {
-  while (Serial2.available()) {
+void serialEvent3() {
+  while (Serial3.available()) {
     // get the new byte:
-    char inChar = (char)Serial2.read();
+    char inChar = (char)Serial3.read();
     if (inChar != ' ' )
     {
       pontBuffer = pontBuffer + 1;

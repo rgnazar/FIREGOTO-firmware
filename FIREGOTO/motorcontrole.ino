@@ -1,25 +1,49 @@
 void iniciapmotores()
 {
-  pinMode(MicroPassoAzpino, OUTPUT);
-  pinMode(MicroPassoAltpino, OUTPUT);
-  pinMode(DirAltpino, OUTPUT);
-  pinMode(DirAzpino, OUTPUT);
-  pinMode(PassoAltpino, OUTPUT);
-  pinMode(PassoAzpino, OUTPUT);
-  digitalWrite(MicroPassoAzpino, HIGH);
-  digitalWrite(MicroPassoAltpino, HIGH);
-  digitalWrite(DirAltpino, HIGH);
-  digitalWrite(DirAzpino, HIGH);
+  //Iniciar as variaveis do motor de passo
+  pinMode(MotorRA_Direcao, OUTPUT);
+  pinMode(MotorRA_Passo, OUTPUT);
+  pinMode(MotorRA_Sleep, OUTPUT);
+  pinMode(MotorRA_Reset, OUTPUT);
+  pinMode(MotorRA_M2, OUTPUT);
+  pinMode(MotorRA_M1, OUTPUT);
+  pinMode(MotorRA_M0, OUTPUT);
+  pinMode(MotorRA_Ativa, OUTPUT);
+  pinMode(MotorDEC_Direcao, OUTPUT);
+  pinMode(MotorDEC_Passo, OUTPUT);
+  pinMode(MotorDEC_Sleep, OUTPUT);
+  pinMode(MotorDEC_Reset, OUTPUT);
+  pinMode(MotorDEC_M2, OUTPUT);
+  pinMode(MotorDEC_M1, OUTPUT);
+  pinMode(MotorDEC_M0, OUTPUT);
+  pinMode(MotorDEC_Ativa, OUTPUT);
+
+  //Aciona os pinos por padrão
+  digitalWrite(MotorRA_Direcao, HIGH);
+  digitalWrite(MotorRA_Passo, LOW);
+  digitalWrite(MotorRA_Sleep, HIGH);
+  digitalWrite(MotorRA_Reset, HIGH);
+  digitalWrite(MotorRA_M2, HIGH);
+  digitalWrite(MotorRA_M1, HIGH);
+  digitalWrite(MotorRA_M0, HIGH);
+  digitalWrite(MotorRA_Ativa, LOW);
+  digitalWrite(MotorDEC_Direcao, LOW);
+  digitalWrite(MotorDEC_Passo, LOW);
+  digitalWrite(MotorDEC_Sleep, HIGH);
+  digitalWrite(MotorDEC_Reset, HIGH);
+  digitalWrite(MotorDEC_M2, HIGH);
+  digitalWrite(MotorDEC_M1, HIGH);
+  digitalWrite(MotorDEC_M0, HIGH);
+  digitalWrite(MotorDEC_Ativa, LOW);
+
   AltMotor.setPinsInverted(true);
   AzMotor.setPinsInverted(true);
-  AltMotor.setMaxSpeed(20000.0);
+  AltMotor.setMaxSpeed(dMaxSpeedAlt);
   AltMotor.setAcceleration(5000.0);
-  AzMotor.setMaxSpeed(20000.0);
+  AzMotor.setMaxSpeed(dMaxSpeedAz);
   AzMotor.setAcceleration(5000.0);
-  Timer3.attachInterrupt(acionamotor);
-  Timer3.start(MinTimer);
-
-
+//  Timer.attachInterrupt(acionamotor);
+//  Timer.start(MinTimer);
 
 }
 
@@ -100,8 +124,8 @@ void SetPosition()
 }
 
 void acionamotor() {
-  AltMotor.run();
-  AzMotor.run();
+
+
   //Cria MicroSeg Virtusal
   Segundo = second();
   if (MilissegundoSeg == Segundo)
@@ -112,7 +136,7 @@ void acionamotor() {
       Microssegundo = 999999;
     }
     SegundoFracao = Microssegundo * 0.000001;
-   SegundoFracao = SegundoFracao + Segundo;
+    SegundoFracao = SegundoFracao + Segundo;
   }
   else
   {

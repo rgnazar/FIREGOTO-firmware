@@ -317,10 +317,13 @@ void setLocalData() //:SCMM/DD/YY# Change Handbox Date to MM/DD/YY #:SC 03/20/14
   int ano = str.toInt();
   str = "";
   ano = ano + 2000;
+    int tmp = -UTC * 60 * 60;
+  adjustTime(-tmp);
   int HH = hour();
   int MM = minute();
   int SS = second();
   setTime(HH, MM, SS, dia, mes, ano);
+  adjustTime(tmp);
   SerialPrint("1");
   configurationFromFlash.DataHora =  now();
   byte b2[sizeof(Configuration)]; // create byte array to store the struct
@@ -370,8 +373,6 @@ void setLocalHora()//:SLHH:MM:SS#  Set the local Time
 void PrintLocalHora()//:Get time (Local) 	:GLHH:MM:SS#	Reply: HH:MM:SS#
 {
   int hhl = int(hour());
-
-
   if (hhl > 23)
   {
     hhl = hhl - 24;
@@ -474,26 +475,12 @@ void printALTmount() //:GA# Get Telescope Altitude Returns: sDD*MM# or sDD*MM'SS
 
 void printRAmount() //:GR# Get Telescope RA Returns: HH:MM.T# or HH:MM:SS#
 {
-  int tmp = DecDeg2HoursHH(RAmount);
-  if (tmp < 10) {
-    SerialPrint("0");
-  }
-  SerialPrint(String(tmp));
-  SerialPrint(":");
-  tmp = DecDeg2HoursMM(RAmount);
-  if (tmp < 10) {
-    SerialPrint("0");
-  }
-  SerialPrint(String(tmp));
-  SerialPrint(":");
-  tmp = DecDeg2HoursSEC(RAmount);
-  if (tmp < 10) {
-    SerialPrint("0");
-  }
-  SerialPrint(String(tmp));
-  SerialPrint("#");
-
-
+  int HH = DecDeg2HoursHH(RAmount);
+  int MM = DecDeg2HoursMM(RAmount);
+  int SS = DecDeg2HoursSEC(RAmount);
+  char str[9];
+  sprintf(str, "%02d:%02d:%02d#", int(HH), int(MM), int(SS));
+  SerialPrint(str);
 }
 
 void printDECmount() //:GD# Get Telescope Declination. Returns: sDD*MM# or sDD*MM'SS#
@@ -502,15 +489,12 @@ void printDECmount() //:GD# Get Telescope Declination. Returns: sDD*MM# or sDD*M
   int Min = abs((int)DecDegtoMin(DECmount));
   int Sec = abs((int)DecDegtoSec(DECmount));
   char str[9];
-
   if (DECmount < 0) {
     sprintf(str, "-%02d*%02d:%02d#", int(Ddeg), int(Min), int(Sec));
   } else {
     sprintf(str, "+%02d*%02d:%02d#", int(Ddeg), int(Min), int(Sec));
   }
-  // str[6] = 223;
   SerialPrint(str);
-
 
 }
 
@@ -542,24 +526,15 @@ void setlatitude() //:StsDD*MM# Sets the current site latitude to sDD*MM# Return
 void printlatitude()// :Gt# Get Current Site Latitude Returns: sDD*MM# The latitude of the current site. Positive inplies North latitude.
 {
 
+  int Ddeg = abs((int)DecDegtoDeg(latitude));
+  int Min = abs((int)DecDegtoMin(latitude));
+  char str[7];
   if (latitude < 0) {
-    SerialPrint("-");
+    sprintf(str, "-%02d*%02d#", int(Ddeg), int(Min));
   } else {
-    SerialPrint("+");
+    sprintf(str, "+%02d*%02d#", int(Ddeg), int(Min));
   }
-  int tmp = abs((int)DecDegtoDeg(latitude));
-  if (tmp < 10) {
-    SerialPrint("0");
-  }
-  SerialPrint(String(abs(tmp)));
-  SerialPrint("*");
-  tmp = (int)DecDegtoMin(latitude);
-  if (tmp < 10) {
-    SerialPrint("0");
-  }
-  SerialPrint(String(tmp));
-  SerialPrint("#");
-
+  SerialPrint(str);
 }
 
 void setlongitude() //:SgsDDD*MM# Set current site's longitude to DDD*MM an ASCII position string Returns: 0 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Invalid 1 - Valid
@@ -591,26 +566,15 @@ void printlongitude() // Get Current Site Longitude Returns: sDDD*MM#
 
 {
 
+  int Ddeg = abs((int)DecDegtoDeg(longitude));
+  int Min = abs((int)DecDegtoMin(longitude));
+  char str[8];
   if (longitude < 0) {
-    SerialPrint("-");
+    sprintf(str, "-%03d*%02d#", int(Ddeg), int(Min));
   } else {
-    SerialPrint("+");
+    sprintf(str, "+%03d*%02d#", int(Ddeg), int(Min));
   }
-  int tmp = abs((int)DecDegtoDeg(longitude));
-  if (tmp < 100) {
-    SerialPrint("0");
-  }
-  if (tmp < 10) {
-    SerialPrint("0");
-  }
-  SerialPrint(String(abs(tmp)));
-  SerialPrint("*");
-  tmp = (int)DecDegtoMin(longitude);
-  if (tmp < 10) {
-    SerialPrint("0");
-  }
-  SerialPrint(String(tmp));
-  SerialPrint("#");
+  SerialPrint(str);
 
 }
 
@@ -667,21 +631,9 @@ void printFirmwareTime() //Get firmware time 	:GVT# 	Reply: HH:MM:SS#
   int HH = hour();
   int MM = minute();
   int SS = second();
-  if (HH < 10) {
-    SerialPrint("0");
-  }
-  SerialPrint(String(HH));
-  SerialPrint(":");
-  if (MM < 10) {
-    SerialPrint("0");
-  }
-  SerialPrint(String(MM));
-  SerialPrint(":");
-  if (SS < 10) {
-    SerialPrint(String ('0'));
-  }
-  SerialPrint(String (SS));
-  SerialPrint(String ('#'));
+  char str[9];
+  sprintf(str, "%02d:%02d:%02d#", int(HH), int(MM), int(SS));
+  SerialPrint(str);
 }
 void printFirmwareNumber() //Get firmware number 	:GVN# 	Reply: 0.99a5#
 {
@@ -808,12 +760,12 @@ void setDECAlvo() //Set target Dec 	:SdsDD:MM:SS# *	Reply: 0 or 1#
   str += inputcmd[10];
   str += inputcmd[11];
   int SS = str.toInt();
+  DECAlvo = DegMinSec2DecDeg(DD, MM, SS);
   str = "";
   if (inputcmd[3] == '-')
   {
-    DD = DD * (-1);
+    DECAlvo = DECAlvo * (-1);
   }
-  DECAlvo = DegMinSec2DecDeg(DD, MM, SS);
   SerialPrint("1");
 }
 
@@ -825,8 +777,8 @@ void synctelescope() //Sync. with current target RA/Dec	:CS#	Reply: [none]
   double HSL = HoraSiderallocal(longitude, HST) ;
   Radec2Azalt(HSL, latitude, RAAlvo, DECAlvo, &AzAlvo, &AltAlvo);
   if ((AzAlvo >= 0) && (AltAlvo >= 0)) {
-    ALTmount = (MaxPassoAlt * AltAlvo / 360.0);
-    AZmount = (MaxPassoAz * AzAlvo / 360.0);
+    ALTmount = ( AltAlvo * ResolucaoeixoAltPassoGrau);
+    AZmount = ( AzAlvo * ResolucaoeixoAzPassoGrau);
     AZmountAlvo = AZmount;
     ALTmountAlvo = ALTmount;
     syncro();
@@ -842,8 +794,8 @@ void synctelescopeString() //:CM# Synchronizes the telescope position with targe
   double HSL = HoraSiderallocal(longitude, HST) ;
   Radec2Azalt(HSL, latitude, RAAlvo, DECAlvo, &AzAlvo, &AltAlvo);
   if ((AzAlvo >= 0) && (AltAlvo >= 0)) {
-    ALTmount = (MaxPassoAlt * AltAlvo / 360.0);
-    AZmount = (MaxPassoAz * AzAlvo / 360.0);
+    ALTmount = ( AltAlvo * ResolucaoeixoAltPassoGrau);
+    AZmount = ( AzAlvo * ResolucaoeixoAzPassoGrau);
     AZmountAlvo = AZmount;
     ALTmountAlvo = ALTmount;
     syncro();

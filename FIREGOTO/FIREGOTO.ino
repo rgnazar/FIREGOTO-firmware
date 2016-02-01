@@ -2,27 +2,43 @@
 #include <Arduino.h>
 #include <math.h>
 #include <Time.h>
-#include <DueTimer.h>
+//#include <DueTimer.h>
+#include <Scheduler.h>
 #include <DueFlashStorage.h>
 
 //Criacao dos motores
 
-#define MicroPassoAltpino 9
-#define MicroPassoAzpino 5
-#define DirAltpino 11
-#define DirAzpino 7
-#define PassoAltpino 10
-#define PassoAzpino 6
 
-AccelStepper AltMotor(AccelStepper::DRIVER, PassoAltpino, DirAltpino);
-AccelStepper AzMotor(AccelStepper::DRIVER, PassoAzpino, DirAzpino);
+#define MotorRA_Direcao 23
+#define MotorRA_Passo 25
+#define MotorRA_Sleep 27
+#define MotorRA_Reset 29
+#define MotorRA_M2 31
+#define MotorRA_M1 33
+#define MotorRA_M0 35
+#define MotorRA_Ativa 37
+#define MotorDEC_Direcao 39
+#define MotorDEC_Passo 41
+#define MotorDEC_Sleep 43
+#define MotorDEC_Reset 45
+#define MotorDEC_M2 47
+#define MotorDEC_M1 49
+#define MotorDEC_M0 51
+#define MotorDEC_Ativa 53
+
+
+AccelStepper AltMotor(AccelStepper::DRIVER, MotorRA_Passo, MotorRA_Direcao);
+AccelStepper AzMotor(AccelStepper::DRIVER, MotorDEC_Passo, MotorDEC_Direcao);
 int accel = 1;
 
 
-/*valores maximo para o passo (Valor ideal 1286400)
-#define MaxPassoAlt 1906036  //valor de resolucao AR = Passo * MicroPasso * reducao ex(200*16*402)/4    (16*200*(117/11)*56)
-#define MaxPassoAz 1906036  //valor de resolucao AR = Passo * MicroPasso * reducao ex(200*16*402)   (16*200*(118/11)*57)
-#define MinTimer 150
+/*valores maximo para o passo (Valor ideal 1286400)*/
+#define dMaxPassoAlt 3812073 /* //valor de resolucao AR = Passo * MicroPasso * reducao ex(200*16*402)/4    (16*200*(117/11)*56)*/
+#define dMaxPassoAz 3812073  /*/valor de resolucao AR = Passo * MicroPasso * reducao ex(200*16*402)   (16*200*(118/11)*57)*/
+#define dMinTimer 170
+#define dMaxSpeedAlt 80000
+#define dMaxSpeedAz 80000
+/*
 // Location ----------------------------------------------------------------------------------------------------------------
 double latitude  = -25.40;
 double longitude = -49.20;
@@ -81,8 +97,8 @@ int dirAlt, dirAz, dirAltant, dirAzant;
 //Variaveis globais de posiÃ§Ã£o fisica do telescopio  ----------------------------------------------------------------------------------------------------------------
 double eixoAltGrausDecimal = 0.0;
 double eixoAzGrausDecimal = 0.0;
-double ResolucaoeixoAltGrausDecimal = 0.0;
-double ResolucaoeixoAzGrausDecimal = 0.0;
+double ResolucaoeixoAltGrausDecimal = 0.0, ResolucaoeixoAltPassoGrau=0.0;
+double ResolucaoeixoAzGrausDecimal = 0.0, ResolucaoeixoAzPassoGrau = 0.0;
 double RAmount = 0.0;
 double DECmount = 0.0;
 double AZmount = 0.0;
@@ -117,7 +133,8 @@ double Microssegundo = 0 , SegundoFracao = 0.0, MilissegundoSeg = 0.0, Milissegu
 
 void setup() {
   Serial.begin(9600);
-  Serial2.begin(9600);
+  Serial3.begin(9600);
+  Scheduler.startLoop(loop1);
 
   /* Flash is erased every time new code is uploaded. Write the default configuration to flash if first time */
   // running for the first time?
@@ -126,9 +143,9 @@ void setup() {
   if (codeRunningForTheFirstTime) {
     Serial.println("yes");
     /* OK first time running, set defaults */
-    configuration.MaxPassoAlt = 1856000;
-    configuration.MaxPassoAz = 1856000;
-    configuration.MinTimer = 180;
+    configuration.MaxPassoAlt = dMaxPassoAlt;
+    configuration.MaxPassoAz = dMaxPassoAz;
+    configuration.MinTimer = dMinTimer;
     configuration.latitude = -25.40;;
     configuration.longitude = -49.20;
     setTime(22, 00, 00, 23, 03, 2015);
@@ -163,6 +180,9 @@ void setup() {
   ErroAlt = ErroAz = 44.0;
   ResolucaoeixoAltGrausDecimal = 360.0 / MaxPassoAlt ;
   ResolucaoeixoAzGrausDecimal = 360.0 / MaxPassoAz ;
+      ResolucaoeixoAltPassoGrau = (MaxPassoAlt  / 360.0);
+    ResolucaoeixoAzPassoGrau = (MaxPassoAz  / 360.0);
+    
 }
 
 
@@ -170,20 +190,21 @@ void setup() {
 void loop() {
   currentMillis = millis();
   CalcPosicaoPasso();
+
   if (PCommadMillis < currentMillis)
   {
     PrintLocalHora();
     Serial.println(String(Hora2DecHora(hour(), minute(), SegundoFracao), 10)) ;
-    PCommadMillis = PCommadMillis + 1497;
+    PCommadMillis = PCommadMillis + 1001;
   }
 
   if (calculaRADECmountMillis < currentMillis)
   {
-    calculaRADECmountMillis = calculaRADECmountMillis + 500;
+    calculaRADECmountMillis = calculaRADECmountMillis + 250;
     calculaRADECmount();
   }
 
-
+  acionamotor();
 
   // print the string when a newline arrives:
   // protegemount();
@@ -201,10 +222,25 @@ void loop() {
   {
     previousMillis = millis();
   }
-
+  acionamotor();
+  yield();
 
 }
 
+void loop1 ()
+{
+  for (int acc = 0; acc < 40; acc++) {
+    AltMotor.run();
+    AzMotor.run();
+  }
+  yield();
 
+  for (int acc = 0; acc < 40; acc++) {
+    acionamotor();
+    AltMotor.run();
+    AzMotor.run();
+  }
+
+}
 
 
