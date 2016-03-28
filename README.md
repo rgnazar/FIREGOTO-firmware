@@ -16,3 +16,6 @@ https://github.com/juanrmn/Arduino-Telescope-Control/tree/master/testing/device/
 
 DueFlashStorage
 https://github.com/sebnil/DueFlashStorage
+
+ Email List
+        https://br.groups.yahoo.com/neo/groups/firegoto
