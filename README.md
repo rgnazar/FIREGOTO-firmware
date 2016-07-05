@@ -3,6 +3,9 @@ Arduino e Montagem Dobson Caseira com GOTO
 
 http://www.astronomoamador.com.br/arduino-controle-de-telescopio
 
+GRUPO
+https://groups.google.com/forum/#!forum/firegoto
+
 Faça você mesmo!!!
 
 Se é adepto ao faça você mesmo;
