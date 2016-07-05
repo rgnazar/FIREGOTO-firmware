@@ -13,10 +13,8 @@ E é curioso;
 E gosta de Astronomia e Observação....
 
 O Projeto.
-
+    
     Depois que fiz a manutenção em uma base Orion Dob GOTO resolvi fazer um projeto open (livre) para automatizar telescopios em bases dobsonianas.
-
-    Alguns critérios: 
 
 Caracteristicas deste projeto:
 1 - Pouca solda;
@@ -33,7 +31,7 @@ Caracteristicas deste projeto:
 
 7 - Aceitar  100% do protocolo LX200;
 
-          8 - Melhorar o uso com  ASCOM;
+8 - Melhorar o uso com  ASCOM;
 
 A Ideia é a movimentação dos eixos em montagem Dobson usando materiais de fácil acesso no mercado nacional fazendo usod o protocolo de comunicação LX200, controlado pela plataforma Arduino Due com código de programação aberto;
 
@@ -80,10 +78,6 @@ Arduino é uma plataforma eletrônica de código aberto. Com hardware e software
 
 https://www.arduino.cc/
 
-
-
-
-
 Característica dos Arduino
 
 Hardware livre, projeto livre, qualquer um pode clonar as placas mas não podem clonar o nome.
@@ -95,7 +89,6 @@ Não há restrição na comercialização de projetos baseado em Arduino.
 Usa arquitetura ARM de processador
 
 Baixo custo
-
 
 Arduino DUE
 Microcontroller AT91SAM3X8E
