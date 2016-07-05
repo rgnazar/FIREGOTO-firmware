@@ -19,4 +19,7 @@ https://github.com/sebnil/DueFlashStorage
 
  Email List
         https://groups.google.com/forum/#!forum/firegoto
+ 
+ GNU AFFERO GENERAL PUBLIC LICENSE
+        https://github.com/rgnazar/FIREGOTO-firmware/blob/master/LICENSE.md
 
