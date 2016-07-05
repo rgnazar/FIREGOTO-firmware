@@ -1,8 +1,6 @@
 <div>
 <div style="text-align:center"><span style="color:rgb(204,204,204);font-size:medium;line-height:1.25;background-color:transparent">&nbsp;</span><span style="color:rgb(204,204,204);font-size:medium;line-height:1.25;background-color:transparent">&nbsp;</span></div>
 <font color="#cccccc" size="3"><span style="line-height:1.25;background-color:transparent">
-<div style="display:block;text-align:left"><img border="0" src="https://sites.google.com/a/astronomoamador.com.br/www/arduino-controle-de-telescopio/LogoNevoeiro.png" style="display:block;margin:5px auto 0px;text-align:center"></div>
-</span></font></div>
 <div><font color="#cccccc" size="3"><br>
 </font></div>
 <div><font color="#cccccc" size="3"><br>
