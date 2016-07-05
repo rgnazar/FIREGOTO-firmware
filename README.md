@@ -14,7 +14,7 @@ E gosta de Astronomia e Observação....
 
 O Projeto.
     
-    Depois que fiz a manutenção em uma base Orion Dob GOTO resolvi fazer um projeto open (livre) para automatizar telescopios em bases dobsonianas.
+Depois que fiz a manutenção em uma base Orion Dob GOTO resolvi fazer um projeto open (livre) para automatizar telescopios em bases dobsonianas.
 
 Caracteristicas deste projeto:
 1 - Pouca solda;
