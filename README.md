@@ -18,4 +18,5 @@ DueFlashStorage
 https://github.com/sebnil/DueFlashStorage
 
  Email List
-        https://br.groups.yahoo.com/neo/groups/firegoto
+        https://groups.google.com/forum/#!forum/firegoto
+
