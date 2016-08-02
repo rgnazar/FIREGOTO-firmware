@@ -39,11 +39,11 @@ int accel = 1;
 #define dMaxSpeedAlt 80000
 #define dMaxSpeedAz 80000
 /*
-// Location ----------------------------------------------------------------------------------------------------------------
-double latitude  = -25.40;
-double longitude = -49.20;
-int UTC = 0;
-setTime(22, 00, 00, 23, 03, 2014);
+  // Location ----------------------------------------------------------------------------------------------------------------
+  double latitude  = -25.40;
+  double longitude = -49.20;
+  int UTC = 0;
+  setTime(22, 00, 00, 23, 03, 2014);
 */
 
 
@@ -79,11 +79,13 @@ unsigned long currentMillis, previousMillis, PCommadMillis, calculaRADECmountMil
 
 //Variaveis de controle para ler comandos LX200  ----------------------------------------------------------------------------------------------------------------
 boolean cmdComplete = false, doispontos = true; // whether the string is complete
-char buffercmd[30];
+char buffercmd[15];
 char inputcmd[30];// a string to hold incoming data
 int pontBuffer = 0;
 int pontCommand = 0;
-int numCommand = 0;
+int numCommand = 0, numCommandexec = 0;
+char Command[15][15];
+
 
 
 
@@ -97,7 +99,7 @@ int dirAlt, dirAz, dirAltant, dirAzant;
 //Variaveis globais de posiÃ§Ã£o fisica do telescopio  ----------------------------------------------------------------------------------------------------------------
 double eixoAltGrausDecimal = 0.0;
 double eixoAzGrausDecimal = 0.0;
-double ResolucaoeixoAltGrausDecimal = 0.0, ResolucaoeixoAltPassoGrau=0.0;
+double ResolucaoeixoAltGrausDecimal = 0.0, ResolucaoeixoAltPassoGrau = 0.0;
 double ResolucaoeixoAzGrausDecimal = 0.0, ResolucaoeixoAzPassoGrau = 0.0;
 double RAmount = 0.0;
 double DECmount = 0.0;
@@ -152,7 +154,7 @@ void setup() {
     MilissegundoSeg = second();
     configuration.DataHora = now();
     configuration.UTC = 0;
-    configuration.Local = "Minha Casa";
+    strcpy (configuration.Local, "Minha Casa");
     // write configuration struct to flash at adress 4
     byte b2[sizeof(Configuration)]; // create byte array to store the struct
     memcpy(b2, &configuration, sizeof(Configuration)); // copy the struct to the byte array
@@ -180,9 +182,9 @@ void setup() {
   ErroAlt = ErroAz = 44.0;
   ResolucaoeixoAltGrausDecimal = 360.0 / MaxPassoAlt ;
   ResolucaoeixoAzGrausDecimal = 360.0 / MaxPassoAz ;
-      ResolucaoeixoAltPassoGrau = (MaxPassoAlt  / 360.0);
-    ResolucaoeixoAzPassoGrau = (MaxPassoAz  / 360.0);
-    
+  ResolucaoeixoAltPassoGrau = (MaxPassoAlt  / 360.0);
+  ResolucaoeixoAzPassoGrau = (MaxPassoAz  / 360.0);
+
 }
 
 
@@ -190,6 +192,11 @@ void setup() {
 void loop() {
   currentMillis = millis();
   CalcPosicaoPasso();
+
+  if (numCommand != numCommandexec)
+  {
+    executecommand();
+  }
 
   if (PCommadMillis < currentMillis)
   {
