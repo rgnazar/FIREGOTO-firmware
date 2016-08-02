@@ -1,23 +1,29 @@
 
 
 void executecommand()
-{ if (cmdComplete) {
-    PCommadMillis = currentMillis + 5000;
-    Serial.println("");
-    Serial.println(inputcmd);
+{
+  flagCommand = 1;
+  numCommandexec = numCommandexec  + 1;
+  if (numCommandexec > 14 )
+  {
+    numCommandexec = 0;
+  }
+  if (cmdComplete) {
+    PrimeiroCommanMillis = currentMillis + 5000;
+    SerialPrintDebug(String(Command[pontCommand][pontBuffer]));
     addbackslash();
-    if (inputcmd[0] != ':')
+    if (Command[pontCommand][0] != ':')
     {
-      if (inputcmd[0] == 0x06)
+      if (Command[pontCommand][0] == 0x06)
       {
         SerialPrint("A");
         /*
-        ACK <0x06> Query of alignment mounting mode.
-        Returns:
-        A If scope in AltAz Mode
-        D If scope is currently engaged by the Autostar Updater Program [Autostar and Autostar II telescopes]
-        L If scope in Land Mode
-        P If scope in Polar Mode */
+          ACK <0x06> Query of alignment mounting mode.
+          Returns:
+          A If scope in AltAz Mode
+          D If scope is currently engaged by the Autostar Updater Program [Autostar and Autostar II telescopes]
+          L If scope in Land Mode
+          P If scope in Polar Mode */
         cmdComplete = false;
       }
       else {
@@ -26,10 +32,10 @@ void executecommand()
       }
     }
     if (cmdComplete) {
-      if (inputcmd[1] == '$') {
-        switch (inputcmd[2]) {
+      if (Command[pontCommand][1] == '$') {
+        switch (Command[pontCommand][2]) {
           case 'B':
-            switch (inputcmd[3]) {
+            switch (Command[pontCommand][3]) {
               case 'D':
                 setDECbacklash();
                 break;
@@ -40,8 +46,8 @@ void executecommand()
 
         }
       }
-      if (inputcmd[1] == 'C') {
-        switch (inputcmd[2]) {
+      if (Command[pontCommand][1] == 'C') {
+        switch (Command[pontCommand][2]) {
           case 'S':
             synctelescope();
             break;
@@ -51,8 +57,8 @@ void executecommand()
 
         }
       }
-      if (inputcmd[1] == 'G') {
-        switch (inputcmd[2]) {
+      if (Command[pontCommand][1] == 'G') {
+        switch (Command[pontCommand][2]) {
           case 'A':
             printALTmount();
             break;
@@ -102,7 +108,7 @@ void executecommand()
             printAZmount();
             break;
           case 'V':
-            switch (inputcmd[3]) {
+            switch (Command[pontCommand][3]) {
               case 'D':
                 printFirmwareDate();
                 break;
@@ -123,34 +129,34 @@ void executecommand()
         }
       }
 
-      if (inputcmd[1] == 'H') //set Hardware
+      if (Command[pontCommand][1] == 'H') //set Hardware
       {
-        switch (inputcmd[2]) {
+        switch (Command[pontCommand][2]) {
           case 'S':
-            if (inputcmd[4] == 'A')//:HSRA0000000#
+            if (Command[pontCommand][4] == 'A')//:HSRA0000000#
             {
               setMaxPassoAlt();
             }
-            if (inputcmd[4] == 'B')//:HSRB0000000#
+            if (Command[pontCommand][4] == 'B')//:HSRB0000000#
             {
               setMaxPassoAz();//:HSRB0000000#
             }
-            if (inputcmd[3] == 'T')//:HST0000000#
+            if (Command[pontCommand][3] == 'T')//:HST0000000#
             {
               setMinTimer(); //:HST0000000#
             }
             break;
 
           case 'G':
-            if (inputcmd[4] == 'A')//:HGRA#
+            if (Command[pontCommand][4] == 'A')//:HGRA#
             {
               getMaxPassoAlt();
             }
-            if (inputcmd[4] == 'B')//:HGRB#
+            if (Command[pontCommand][4] == 'B')//:HGRB#
             {
               getMaxPassoAz();//:HGRB#
             }
-            if (inputcmd[3] == 'T')//:HGT#
+            if (Command[pontCommand][3] == 'T')//:HGT#
             {
               getMinTimer(); //:HGT#
             }
@@ -158,8 +164,8 @@ void executecommand()
         }
       }
 
-      if (inputcmd[1] == 'M') {
-        switch (inputcmd[2]) {
+      if (Command[pontCommand][1] == 'M') {
+        switch (Command[pontCommand][2]) {
           case 'S':
             gototeleEQAR();
             break;
@@ -181,16 +187,16 @@ void executecommand()
         }
       }
       /* Set rate to Guide 	:RG# 	Reply: [none]
-      Set rate to Centering 	:RC# 	Reply: [none]
-      Set rate to Move 	:RM# 	Reply: [none]
-      Set rate to Slew 	:RS# 	Reply: [none]
-      Set rate to n (1-9)*3	:Rn# 	Reply: [none]   */
-      if (inputcmd[1] == 'R') {
+        Set rate to Centering 	:RC# 	Reply: [none]
+        Set rate to Move 	:RM# 	Reply: [none]
+        Set rate to Slew 	:RS# 	Reply: [none]
+        Set rate to n (1-9)*3	:Rn# 	Reply: [none]   */
+      if (Command[pontCommand][1] == 'R') {
         MoveRate();
       }
 
-      if (inputcmd[1] == 'S') {
-        switch (inputcmd[2]) {
+      if (Command[pontCommand][1] == 'S') {
+        switch (Command[pontCommand][2]) {
           case 'C':
             setLocalData();
             break;
@@ -229,18 +235,18 @@ void executecommand()
             break;
         }
         /*
-        :U# Toggle between low/hi precision positions
-        Low - RA displays and messages HH:MM.T sDD*MM
-        High - Dec/Az/El displays and messages HH:MM:SS sDD*MM:SS
-        Returns Nothing */
+          :U# Toggle between low/hi precision positions
+          Low - RA displays and messages HH:MM.T sDD*MM
+          High - Dec/Az/El displays and messages HH:MM:SS sDD*MM:SS
+          Returns Nothing */
       }
-      if (inputcmd[1] == 'U') {
+      if (Command[pontCommand][1] == 'U') {
         SerialPrint("00:00:00#");
       }
 
-      if (inputcmd[1] == 'Q') {
+      if (Command[pontCommand][1] == 'Q') {
         Stoptelescope();
-        switch (inputcmd[2]) {
+        switch (Command[pontCommand][2]) {
           case 's':
             parasul();
             break;
@@ -258,24 +264,23 @@ void executecommand()
 
 
     }
-    delay(1);
   }
   if (statusmovimentacao != 0 )
   {
     gototeleEQAR ();
   }
 
-
-
-  for (int j = 0; j < 19; j++) {
-    inputcmd[j] = ' ';
+  for (int j = 0; j < 15; j++) {
+    Command[pontCommand][j] = ' ';
   }
+  flagCommand = 0;
+  delay(1);
 }
 
 void printerror()
 {
   SerialPrint("!#");
-  //Serial.println(inputcmd);
+  //Serial.println(Command[pontCommand][pontBuffer]);
 }
 
 void printHelp()
@@ -304,20 +309,20 @@ void printUTC() //:GG# Get UTC offset time Returns: sHH# or sHH.H#
 void setLocalData() //:SCMM/DD/YY# Change Handbox Date to MM/DD/YY #:SC 03/20/14#
 {
   String str = "";
-  str += inputcmd[3];
-  str += inputcmd[4];
+  str += Command[pontCommand][3];
+  str += Command[pontCommand][4];
   int mes = str.toInt();
   str = "";
-  str += inputcmd[6];
-  str += inputcmd[7];
+  str += Command[pontCommand][6];
+  str += Command[pontCommand][7];
   int dia = str.toInt();
   str = "";
-  str += inputcmd[9];
-  str += inputcmd[10];
+  str += Command[pontCommand][9];
+  str += Command[pontCommand][10];
   int ano = str.toInt();
   str = "";
   ano = ano + 2000;
-    int tmp = -UTC * 60 * 60;
+  int tmp = -UTC * 60 * 60;
   adjustTime(-tmp);
   int HH = hour();
   int MM = minute();
@@ -345,16 +350,16 @@ void printDataLocal() //Get date 	:GC# 	 Reply: MM/DD/YY#
 void setLocalHora()//:SLHH:MM:SS#  Set the local Time
 {
   String str = "";
-  str += inputcmd[3];
-  str += inputcmd[4];
+  str += Command[pontCommand][3];
+  str += Command[pontCommand][4];
   int HH = str.toInt();
   str = "";
-  str += inputcmd[6];
-  str += inputcmd[7];
+  str += Command[pontCommand][6];
+  str += Command[pontCommand][7];
   int MM = str.toInt();
   str = "";
-  str += inputcmd[9];
-  str += inputcmd[10];
+  str += Command[pontCommand][9];
+  str += Command[pontCommand][10];
   int SS = str.toInt();
   str = "";
   int dia = day();
@@ -400,17 +405,17 @@ void printOperatocao()
   SerialPrint("N#");
 }
 /*std Autostars return "Autostar"
-LX200s return "LX2001"
-RCXs return "RCX400"
-LSs returned "ETX-LS" and now just "LS"
- LS/AutostarIII GVF response is (currently) only the firmware version: "1.6#"
-(the Autostar III responds to a :GW# with "AN0#" (if not aligned or tracking))
-After reading the excellent info on http://www.weasner.com   I learn that : " when typing a single control-F on the terminal  the Autostar should echo an "A" or "P" depending upon whether it's
- set up as Alt/Az or Polar mount status and when typing #:GVF#  it should respond with its identification string, including the word Autostar and a time and date (when that firmware version
- was built at Meade) ".
-Indeed  :
- Ctrl -F    ---> A
-#:GVF#   ---> #Autostar|A|12Ea #
+  LX200s return "LX2001"
+  RCXs return "RCX400"
+  LSs returned "ETX-LS" and now just "LS"
+  LS/AutostarIII GVF response is (currently) only the firmware version: "1.6#"
+  (the Autostar III responds to a :GW# with "AN0#" (if not aligned or tracking))
+  After reading the excellent info on http://www.weasner.com   I learn that : " when typing a single control-F on the terminal  the Autostar should echo an "A" or "P" depending upon whether it's
+  set up as Alt/Az or Polar mount status and when typing #:GVF#  it should respond with its identification string, including the word Autostar and a time and date (when that firmware version
+  was built at Meade) ".
+  Indeed  :
+  Ctrl -F    ---> A
+  #:GVF#   ---> #Autostar|A|12Ea #
 */
 
 void  setBufferGps()
@@ -436,11 +441,11 @@ void printSideralHora()
 
 //:GW# Get Scope Alignment Status
 /*Returns:
-<mount><tracking><alignment>#
-where:
-mount: A-AzEl mounted, P-Equatorially mounted, G-german mounted equatorial
-tracking: T-tracking, N-not tracking
-alignment: 0-needs alignment, 1-one star aligned, 2-two star aligned, 3-three star aligned.
+  <mount><tracking><alignment>#
+  where:
+  mount: A-AzEl mounted, P-Equatorially mounted, G-german mounted equatorial
+  tracking: T-tracking, N-not tracking
+  alignment: 0-needs alignment, 1-one star aligned, 2-two star aligned, 3-three star aligned.
 */
 void printalinhamento()
 {
@@ -448,7 +453,7 @@ void printalinhamento()
 }
 
 /*:GZ# Get telescope azimuth
-Returns: DDD*MM#T or DDD*MM'SS#*/
+  Returns: DDD*MM#T or DDD*MM'SS#*/
 void printAZmount()
 {
   char str[10];
@@ -502,15 +507,15 @@ void setlatitude() //:StsDD*MM# Sets the current site latitude to sDD*MM# Return
 {
 
   String str = "";
-  str += inputcmd[4];
-  str += inputcmd[5];
+  str += Command[pontCommand][4];
+  str += Command[pontCommand][5];
   int DD = str.toInt();
   str = "";
-  str += inputcmd[7];
-  str += inputcmd[8];
+  str += Command[pontCommand][7];
+  str += Command[pontCommand][8];
   int MM = str.toInt();
   str = "";
-  if (inputcmd[3] == '-')
+  if (Command[pontCommand][3] == '-')
   {
     DD = DD * (-1);
   }
@@ -541,16 +546,16 @@ void setlongitude() //:SgsDDD*MM# Set current site's longitude to DDD*MM an ASCI
 //NO PROTOCOLO DA MEADE O SINAL ÃƒË† AO CONTRARIO
 {
   String str = "";
-  str += inputcmd[4];
-  str += inputcmd[5];
-  str += inputcmd[6];
+  str += Command[pontCommand][4];
+  str += Command[pontCommand][5];
+  str += Command[pontCommand][6];
   int DD = str.toInt();
   str = "";
-  str += inputcmd[8];
-  str += inputcmd[9];
+  str += Command[pontCommand][8];
+  str += Command[pontCommand][9];
   int MM = str.toInt();
   str = "";
-  if (inputcmd[3] != '-')
+  if (Command[pontCommand][3] != '-')
   {
     DD = DD * (-1);
   }
@@ -666,8 +671,8 @@ void printHorizonteLimite() //:Go# Get Lower Limit Returns: DD*#
 void setAlturaLimite() //:Sh DD# Set the maximum object elevation limit to DD#
 {
   String str = "";
-  str += inputcmd[4];
-  str += inputcmd[5];
+  str += Command[pontCommand][4];
+  str += Command[pontCommand][5];
   AltitudeLimite = str.toInt();
   str = "";
   SerialPrint("1");
@@ -676,8 +681,8 @@ void setAlturaLimite() //:Sh DD# Set the maximum object elevation limit to DD#
 void setHorizonteLimite() //:SoDD*# Set lowest elevation to which the telescope will slew
 {
   String str = "";
-  str += inputcmd[4];
-  str += inputcmd[5];
+  str += Command[pontCommand][4];
+  str += Command[pontCommand][5];
   HorizonteLimite = str.toInt();
   str = "";
   SerialPrint(String(HorizonteLimite));
@@ -693,8 +698,8 @@ void setObservatorioNome() // Set site 0 name 	:SMsss...# 	Reply: 0 or 1#
 {
   String str = "";
   int i = 4;
-  while (inputcmd[i] != '#')
-  { str += inputcmd[i];
+  while (Command[pontCommand][i] != '#')
+  { str += Command[pontCommand][i];
     i++;
   }
   str.toCharArray(  configuration.Local, sizeof(str));
@@ -704,10 +709,10 @@ void setObservatorioNome() // Set site 0 name 	:SMsss...# 	Reply: 0 or 1#
 void setHoraparaUTC() //:SG-03# :SGsHH.H# Set the number of hours added to local time to yield UTC
 {
   String str = "";
-  str += inputcmd[4];
-  str += inputcmd[5];
+  str += Command[pontCommand][4];
+  str += Command[pontCommand][5];
   UTC = str.toInt();
-  if (inputcmd[3] == '-')
+  if (Command[pontCommand][3] == '-')
   {
     UTC = UTC * -1;
   }
@@ -728,16 +733,16 @@ void setRAAlvo() //:Sr03:43:56# Set target RA 	:SrHH:MM:SS# * 	Reply: 0 or 1#
 {
   ativaacom = 0;
   String str = "";
-  str += inputcmd[3];
-  str += inputcmd[4];
+  str += Command[pontCommand][3];
+  str += Command[pontCommand][4];
   int HH = str.toInt();
   str = "";
-  str += inputcmd[6];
-  str += inputcmd[7];
+  str += Command[pontCommand][6];
+  str += Command[pontCommand][7];
   int MM = str.toInt();
   str = "";
-  str += inputcmd[9];
-  str += inputcmd[10];
+  str += Command[pontCommand][9];
+  str += Command[pontCommand][10];
   int SS = str.toInt();
   str = "";
   RAAlvo = Hours2DecDegrees(HH, MM, SS);
@@ -749,20 +754,20 @@ void setDECAlvo() //Set target Dec 	:SdsDD:MM:SS# *	Reply: 0 or 1#
 {
   ativaacom = 0;
   String str = "";
-  str += inputcmd[4];
-  str += inputcmd[5];
+  str += Command[pontCommand][4];
+  str += Command[pontCommand][5];
   int DD = str.toInt();
   str = "";
-  str += inputcmd[7];
-  str += inputcmd[8];
+  str += Command[pontCommand][7];
+  str += Command[pontCommand][8];
   int MM = str.toInt();
   str = "";
-  str += inputcmd[10];
-  str += inputcmd[11];
+  str += Command[pontCommand][10];
+  str += Command[pontCommand][11];
   int SS = str.toInt();
   DECAlvo = DegMinSec2DecDeg(DD, MM, SS);
   str = "";
-  if (inputcmd[3] == '-')
+  if (Command[pontCommand][3] == '-')
   {
     DECAlvo = DECAlvo * (-1);
   }
@@ -807,13 +812,13 @@ void synctelescopeString() //:CM# Synchronizes the telescope position with targe
 void setRAbacklash ()// Set RA backlash amount (in ArcSec)	:$BRnnn# 	Reply: 0 or 1#
 {
   String str = "";
-  str += inputcmd[4];
-  if (inputcmd[5] != '#')
+  str += Command[pontCommand][4];
+  if (Command[pontCommand][5] != '#')
   {
-    str += inputcmd[5];
-    if (inputcmd[6] != '#')
+    str += Command[pontCommand][5];
+    if (Command[pontCommand][6] != '#')
     {
-      str += inputcmd[6];
+      str += Command[pontCommand][6];
     }
   }
   RAbacklash = str.toInt();
@@ -826,13 +831,13 @@ void setDECbacklash ()// Set Dec backlash amount (in ArcSec)	:$BDnnn#	Reply: 0 o
 
 {
   String str = "";
-  str += inputcmd[4];
-  if (inputcmd[5] != '#')
+  str += Command[pontCommand][4];
+  if (Command[pontCommand][5] != '#')
   {
-    str += inputcmd[5];
-    if (inputcmd[6] != '#')
+    str += Command[pontCommand][5];
+    if (Command[pontCommand][6] != '#')
     {
-      str += inputcmd[6];
+      str += Command[pontCommand][6];
     }
   }
   DECbacklash = str.toInt();
@@ -955,7 +960,7 @@ void parasul()
 void MoveRate()
 {
   int ratepadrao = (int)(MaxPassoAz / 86400);
-  switch (inputcmd[2]) {
+  switch (Command[pontCommand][2]) {
     case '0':
       accel = ratepadrao * 2;
       break;
@@ -997,19 +1002,18 @@ void MoveRate()
       accel = ratepadrao * 128000;
       break;
   }
-
 }
 
 void setMaxPassoAlt()  //:HSRA0000000#
 {
   String str = "";
-  str += inputcmd[5];
-  str += inputcmd[6];
-  str += inputcmd[7];
-  str += inputcmd[8];
-  str += inputcmd[9];
-  str += inputcmd[10];
-  str += inputcmd[11];
+  str += Command[pontCommand][5];
+  str += Command[pontCommand][6];
+  str += Command[pontCommand][7];
+  str += Command[pontCommand][8];
+  str += Command[pontCommand][9];
+  str += Command[pontCommand][10];
+  str += Command[pontCommand][11];
   unsigned int SS = str.toInt();
   configurationFromFlash.MaxPassoAlt = SS;
   MaxPassoAlt = configurationFromFlash.MaxPassoAlt;
@@ -1024,13 +1028,13 @@ void setMaxPassoAlt()  //:HSRA0000000#
 void setMaxPassoAz() //:HSRB0000000#
 {
   String str = "";
-  str += inputcmd[5];
-  str += inputcmd[6];
-  str += inputcmd[7];
-  str += inputcmd[8];
-  str += inputcmd[9];
-  str += inputcmd[10];
-  str += inputcmd[11];
+  str += Command[pontCommand][5];
+  str += Command[pontCommand][6];
+  str += Command[pontCommand][7];
+  str += Command[pontCommand][8];
+  str += Command[pontCommand][9];
+  str += Command[pontCommand][10];
+  str += Command[pontCommand][11];
   unsigned int SS = str.toInt();
   configurationFromFlash.MaxPassoAz = SS;
   MaxPassoAz = configurationFromFlash.MaxPassoAz;
@@ -1044,13 +1048,13 @@ void setMaxPassoAz() //:HSRB0000000#
 void setMinTimer() //:HST0000000#
 {
   String str = "";
-  str += inputcmd[6];
-  str += inputcmd[7];
-  str += inputcmd[8];
-  str += inputcmd[9];
-  str += inputcmd[10];
-  str += inputcmd[11];
-  str += inputcmd[12];
+  str += Command[pontCommand][6];
+  str += Command[pontCommand][7];
+  str += Command[pontCommand][8];
+  str += Command[pontCommand][9];
+  str += Command[pontCommand][10];
+  str += Command[pontCommand][11];
+  str += Command[pontCommand][12];
   unsigned int SS = str.toInt();
   configurationFromFlash.MinTimer = SS + 150;
   MinTimer = configurationFromFlash.MinTimer ;  //valor minimo
@@ -1085,175 +1089,175 @@ void getMinTimer() //:HGT#
 
 
 /*
-Move telescope (to current Equ target)	:MS#	Reply: e# *2
-Move telescope (to current Hor target)	:MA#	Reply: e# *2
-*2 = Error codes for the MS and MA commands are as follows: e=0 (no error), e=1 (below horizon), e=2 (no object), e=4 (position unreachable), e=5 (not aligned), e=6 (outside limits)*/
+  Move telescope (to current Equ target)	:MS#	Reply: e# *2
+  Move telescope (to current Hor target)	:MA#	Reply: e# *2
+  2 = Error codes for the MS and MA commands are as follows: e=0 (no error), e=1 (below horizon), e=2 (no object), e=4 (position unreachable), e=5 (not aligned), e=6 (outside limits)*/
 /*
 
-http://www.stellarjourney.com/index.php?r=site/software_telescope
-Here's a summary of the features/command set currently implemented for the On-Step controller:
-Return values generally indicate failure (0) or success (1).
-Command length is limited to 20 chars, 2 for the command frame ":#" + 2 for the code "CC" + a maximum of 16 for the parameter "P": ":CCPPP...#". Cr/lf chars can be sent along with your command, but are ignored.
+  http://www.stellarjourney.com/index.php?r=site/software_telescope
+  Here's a summary of the features/command set currently implemented for the On-Step controller:
+  Return values generally indicate failure (0) or success (1).
+  Command length is limited to 20 chars, 2 for the command frame ":#" + 2 for the code "CC" + a maximum of 16 for the parameter "P": ":CCPPP...#". Cr/lf chars can be sent along with your command, but are ignored.
 
 
-Date/time commands
-pronto Set date 	:SCMM/DD/YY#	Reply: 0 or 1#
-Get date 	:GC# 	Reply: MM/DD/YY#
-Set time (Local) 	:SLHH:MM:SS#	Reply: 0 or 1#
-Get time (Local) 	:GLHH:MM:SS#	Reply: HH:MM:SS#
-Set time (Sidereal) 	:SSHH:MM:SS#	Reply: 0 or 1#
-Get time (Sidereal) 	:GS# 	Reply: HH:MM:SS#
+  Date/time commands
+  pronto Set date 	:SCMM/DD/YY#	Reply: 0 or 1#
+  Get date 	:GC# 	Reply: MM/DD/YY#
+  Set time (Local) 	:SLHH:MM:SS#	Reply: 0 or 1#
+  Get time (Local) 	:GLHH:MM:SS#	Reply: HH:MM:SS#
+  Set time (Sidereal) 	:SSHH:MM:SS#	Reply: 0 or 1#
+  Get time (Sidereal) 	:GS# 	Reply: HH:MM:SS#
 
-Site/Location commands
-Set UTC Offset(for current site)	:SGsHH# 	Reply: 0 or 1#
-Get UTC Offset(for current site)	:GG# 	Reply: sHH#
-The UTC Offset value is the number of hours to add to your Local Time (Standard Time) to get Universal Time.
-Set Latitude (for current site)	:StsDD*MM# 	Reply: 0 or 1#
-Get Latitude (for current site)	:Gt# 	Reply: sDD*MM#
-Set Longitude (for current site)	:SgDDD*MM# 	Reply: 0 or 1#
-Get Longitude (for current site)	:Gg# 	Reply: DDD*MM#
-Set site 0 name 	:SMsss...# 	Reply: 0 or 1#
-Set site 1 name 	:SNsss...# 	Reply: 0 or 1#
-Set site 2 name 	:SOsss...# 	Reply: 0 or 1#
-Set site 3 name 	:SPsss...# 	Reply: 0 or 1#
-Get site 0 name 	:GM# 	Reply: sss...#
-Get site 1 name 	:GN# 	Reply: sss...#
-Get site 2 name 	:GO# 	Reply: sss...#
-Get site 3 name 	:GP# 	Reply: sss...#
-Select site n (0-3) 	:Wn# 	Reply: [none]
+  Site/Location commands
+  Set UTC Offset(for current site)	:SGsHH# 	Reply: 0 or 1#
+  Get UTC Offset(for current site)	:GG# 	Reply: sHH#
+  The UTC Offset value is the number of hours to add to your Local Time (Standard Time) to get Universal Time.
+  Set Latitude (for current site)	:StsDD*MM# 	Reply: 0 or 1#
+  Get Latitude (for current site)	:Gt# 	Reply: sDD*MM#
+  Set Longitude (for current site)	:SgDDD*MM# 	Reply: 0 or 1#
+  Get Longitude (for current site)	:Gg# 	Reply: DDD*MM#
+  Set site 0 name 	:SMsss...# 	Reply: 0 or 1#
+  Set site 1 name 	:SNsss...# 	Reply: 0 or 1#
+  Set site 2 name 	:SOsss...# 	Reply: 0 or 1#
+  Set site 3 name 	:SPsss...# 	Reply: 0 or 1#
+  Get site 0 name 	:GM# 	Reply: sss...#
+  Get site 1 name 	:GN# 	Reply: sss...#
+  Get site 2 name 	:GO# 	Reply: sss...#
+  Get site 3 name 	:GP# 	Reply: sss...#
+  Select site n (0-3) 	:Wn# 	Reply: [none]
 
-Slewing/Movement commands
-Set target RA 	:SrHH:MM:SS# * 	Reply: 0 or 1#
-Get target RA 	:Gr# 	Reply: HH:MM:SS# *
-Set target Dec 	:SdsDD:MM:SS# *	Reply: 0 or 1#
-Get target Dec 	:Gd# 	Reply: sDD*MM'SS# *
-Set target Azm 	:SgDDD:MM:SS# *	Reply: 0 or 1#
-Get target Azm 	:Gg# 	Reply: DDD*MM'SS# *
-Set target Alt 	:StsDD:MM:SS# *	Reply: 0 or 1#
-Get target Alt 	:Gt# 	Reply: sDD*MM'SS# *
-Get telescope HA 	:GH# 	Reply: HH:MM:SS# *
-Get telescope RA 	:GR# 	Reply: HH:MM:SS# *
-Get telescope Dec 	:GD# 	Reply: sDD*MM'SS# *
-Get telescope Azm 	:GZ# 	Reply: DDD*MM'SS# *
-Get telescope Alt 	:GA# 	Reply: sDD*MM'SS# *
-* = Defaults to high precision mode, in low precision mode "HH:MM.M", "sDD*MM", or "DDD*MM" are used as appropriate.
-Set horizon limit 	:ShsDD# 	Reply: 0 or 1#
-Get horizon limit 	:GhsDD# 	Reply: sDD#
-Set overhead limit 	:SoDD# 	Reply: 0 or 1#
-Get overhead limit 	:GoDD# 	Reply: sDD#
-The horizon limit sets how far below (or above) the horizon the telescope will point for a goto:
-Valid range (in degrees) is +30 to -30.
-The overhead limit helps keep the telescope tube from hitting the tripod etc. during a goto:
-Valid range (in degrees) is 60 to 90.
-Move telescope (to current Equ target)	:MS#	Reply: e# *2
-Move telescope (to current Hor target)	:MA#	Reply: e# *2
-*2 = Error codes for the MS and MA commands are as follows:
-e=0 (no error), e=1 (below horizon), e=2 (no object), e=4 (position unreachable), e=5 (not aligned), e=6 (outside limits)
-Stop telescope 	:Q# 	Reply: [none]
-Move telescope east (at current rate) 	:Me#	Reply: [none]
-Move telescope west (at current rate) 	:Mw#	Reply: [none]
-Move telescope north (at current rate)	:Mn#	Reply: [none]
-Move telescope south (at current rate)	:Ms#	Reply: [none]
-Stop moving east 	:Qe# 	Reply: [none]
-Stop moving west 	:Qw# 	Reply: [none]
-Stop moving north 	:Qn# 	Reply: [none]
-Stop moving south 	:Qs# 	Reply: [none]
-Pulse guide (at current rate):
-d=n,s,e,w
-nnnn=time in mS
-(from 20 to 16399mS) 	:Mgdnnnn# 	Reply: [none]
-Set rate to Guide 	:RG# 	Reply: [none]
-Set rate to Centering 	:RC# 	Reply: [none]
-Set rate to Move 	:RM# 	Reply: [none]
-Set rate to Slew 	:RS# 	Reply: [none]
-Set rate to n (1-9)*3	:Rn# 	Reply: [none]
-*3 = Slew rates are as follows.
-All values are in multipules of the sidereal rate:
-R1(RG)=0.5X, R2=1X, R3=2X, R4(RC)=4X, R5=16X, R6=32X, R7(RM)=60X, R8=120X, R9(RS)=240X
-Set sidereal rate RA (0 or 60Hz)	:STDD.D# 	Reply: [none]
-Get sidereal rate RA (0 or 60Hz)	:GT# 	Reply: 0 or 60#
-Get distance bars (indicates slew)	:D#	Reply: \0x7F#
-Pier side 	:Gm# 	Reply: N#, E# or W#
+  Slewing/Movement commands
+  Set target RA 	:SrHH:MM:SS# * 	Reply: 0 or 1#
+  Get target RA 	:Gr# 	Reply: HH:MM:SS# *
+  Set target Dec 	:SdsDD:MM:SS# *	Reply: 0 or 1#
+  Get target Dec 	:Gd# 	Reply: sDD*MM'SS# *
+  Set target Azm 	:SgDDD:MM:SS# *	Reply: 0 or 1#
+  Get target Azm 	:Gg# 	Reply: DDD*MM'SS# *
+  Set target Alt 	:StsDD:MM:SS# *	Reply: 0 or 1#
+  Get target Alt 	:Gt# 	Reply: sDD*MM'SS# *
+  Get telescope HA 	:GH# 	Reply: HH:MM:SS# *
+  Get telescope RA 	:GR# 	Reply: HH:MM:SS# *
+  Get telescope Dec 	:GD# 	Reply: sDD*MM'SS# *
+  Get telescope Azm 	:GZ# 	Reply: DDD*MM'SS# *
+  Get telescope Alt 	:GA# 	Reply: sDD*MM'SS# *
+  = Defaults to high precision mode, in low precision mode "HH:MM.M", "sDD*MM", or "DDD*MM" are used as appropriate.
+  Set horizon limit 	:ShsDD# 	Reply: 0 or 1#
+  Get horizon limit 	:GhsDD# 	Reply: sDD#
+  Set overhead limit 	:SoDD# 	Reply: 0 or 1#
+  Get overhead limit 	:GoDD# 	Reply: sDD#
+  The horizon limit sets how far below (or above) the horizon the telescope will point for a goto:
+  Valid range (in degrees) is +30 to -30.
+  The overhead limit helps keep the telescope tube from hitting the tripod etc. during a goto:
+  Valid range (in degrees) is 60 to 90.
+  Move telescope (to current Equ target)	:MS#	Reply: e# *2
+  Move telescope (to current Hor target)	:MA#	Reply: e# *2
+  2 = Error codes for the MS and MA commands are as follows:
+  e=0 (no error), e=1 (below horizon), e=2 (no object), e=4 (position unreachable), e=5 (not aligned), e=6 (outside limits)
+  Stop telescope 	:Q# 	Reply: [none]
+  Move telescope east (at current rate) 	:Me#	Reply: [none]
+  Move telescope west (at current rate) 	:Mw#	Reply: [none]
+  Move telescope north (at current rate)	:Mn#	Reply: [none]
+  Move telescope south (at current rate)	:Ms#	Reply: [none]
+  Stop moving east 	:Qe# 	Reply: [none]
+  Stop moving west 	:Qw# 	Reply: [none]
+  Stop moving north 	:Qn# 	Reply: [none]
+  Stop moving south 	:Qs# 	Reply: [none]
+  Pulse guide (at current rate):
+  d=n,s,e,w
+  nnnn=time in mS
+  (from 20 to 16399mS) 	:Mgdnnnn# 	Reply: [none]
+  Set rate to Guide 	:RG# 	Reply: [none]
+  Set rate to Centering 	:RC# 	Reply: [none]
+  Set rate to Move 	:RM# 	Reply: [none]
+  Set rate to Slew 	:RS# 	Reply: [none]
+  Set rate to n (1-9)*3	:Rn# 	Reply: [none]
+  3 = Slew rates are as follows.
+  All values are in multipules of the sidereal rate:
+  R1(RG)=0.5X, R2=1X, R3=2X, R4(RC)=4X, R5=16X, R6=32X, R7(RM)=60X, R8=120X, R9(RS)=240X
+  Set sidereal rate RA (0 or 60Hz)	:STDD.D# 	Reply: [none]
+  Get sidereal rate RA (0 or 60Hz)	:GT# 	Reply: 0 or 60#
+  Get distance bars (indicates slew)	:D#	Reply: \0x7F#
+  Pier side 	:Gm# 	Reply: N#, E# or W#
 
-Sync. command
-Sync. with current target RA/Dec	:CS#	Reply: [none]
+  Sync. command
+  Sync. with current target RA/Dec	:CS#	Reply: [none]
 
-Anti-backlash commands
-Set RA backlash amount (in ArcSec)	:$BRnnn# 	Reply: 0 or 1#
-Set Dec backlash amount (in ArcSec)	:$BDnnn#	Reply: 0 or 1#
+  Anti-backlash commands
+  Set RA backlash amount (in ArcSec)	:$BRnnn# 	Reply: 0 or 1#
+  Set Dec backlash amount (in ArcSec)	:$BDnnn#	Reply: 0 or 1#
 
-Periodic error correction commands
-Turn PEC on 	:$QZ+# 	Reply: [none]
-Turn PEC off 	:$QZ-# 	Reply: [none]
-Clear PEC data 	:$QZZ# 	Reply: [none]
-Start recording PEC 	:$QZ/# 	Reply: [none]
-Save PEC data/settings to EEPROM	:$QZ!#	Reply: [none]
-Get PEC status returns:
-I-Ignore PEC,
-P-Playing PEC, p-Getting ready to play PEC,
-R-Record PEC, r-Getting ready to record PEC 	:$QZ?# 	Reply: s#
-Readout PEC data 	:VRnnnn# 	Reply: sddd#
-Readout PEC data at current index (while playing/recording),
-also returns index 	:VR# 	Reply: sddd,ddd#
-Write PEC data 	:WRnnnn,sddd# 	Reply: 0 or 1#
-PEC works as follows:
+  Periodic error correction commands
+  Turn PEC on 	:$QZ+# 	Reply: [none]
+  Turn PEC off 	:$QZ-# 	Reply: [none]
+  Clear PEC data 	:$QZZ# 	Reply: [none]
+  Start recording PEC 	:$QZ/# 	Reply: [none]
+  Save PEC data/settings to EEPROM	:$QZ!#	Reply: [none]
+  Get PEC status returns:
+  I-Ignore PEC,
+  P-Playing PEC, p-Getting ready to play PEC,
+  R-Record PEC, r-Getting ready to record PEC 	:$QZ?# 	Reply: s#
+  Readout PEC data 	:VRnnnn# 	Reply: sddd#
+  Readout PEC data at current index (while playing/recording),
+  also returns index 	:VR# 	Reply: sddd,ddd#
+  Write PEC data 	:WRnnnn,sddd# 	Reply: 0 or 1#
+  PEC works as follows:
 
-In-memory values are byte sized integers (corrections) that hold the number of steps to be applied (recorded/played) at a rate of one correction per second. Up to 824 bytes are available for storage (i.e. 824 seconds for a worm rotation). My implementation uses just 240 bytes (360 tooth worm gear, one revolution every 4 minutes).
+  In-memory values are byte sized integers (corrections) that hold the number of steps to be applied (recorded/played) at a rate of one correction per second. Up to 824 bytes are available for storage (i.e. 824 seconds for a worm rotation). My implementation uses just 240 bytes (360 tooth worm gear, one revolution every 4 minutes).
 
-After the data buffer is cleared ($QZZ), the next record session stores the guiding corrections without averaging. Subsequent recording of the guiding corrections use a 2:1 weighted average favoring the buffer. Data in the buffer is played back one second before the record time in the cycle to help compensate for guiding correction latency.
+  After the data buffer is cleared ($QZZ), the next record session stores the guiding corrections without averaging. Subsequent recording of the guiding corrections use a 2:1 weighted average favoring the buffer. Data in the buffer is played back one second before the record time in the cycle to help compensate for guiding correction latency.
 
-When reading and writing PEC data the units used are steps.
+  When reading and writing PEC data the units used are steps.
 
-The save to EEPROM command allows the results to be recovered after a power cycle. This command takes several seconds to complete and should only be issued after you park or home the mount (stop tracking).
+  The save to EEPROM command allows the results to be recovered after a power cycle. This command takes several seconds to complete and should only be issued after you park or home the mount (stop tracking).
 
-Alignment commands
-Align, polar alignment mode	:AP# 	Reply: [none]
-Align, one-star*4	:A1# 	Reply: 0 or 1#
-Align, two-star*4	:A2# 	Reply: 0 or 1#
-Align, three-star*4	:A3# 	Reply: 0 or 1#
-Align, accept*4 	:A+# 	Reply: 0 or 1#
-*4 = The one star alignment is implemented to correct RA/Dec offset. Two star alignment adds a second star to measure/correct for polar axis Altitude misalignment. Three star alignment adds a third star to measure/correct for polar axis Azimuth misalignment. These are saved when Set park is called and maintained when Parking/Unparking the mount. The sync. equatorial coordinates command refines the model for a local area of the sky, this refinement is lost when the power is cycled unless another Set park is called. The intended use of these commands is as follows...
-Call A1. {or A2/A3.}
-Set RA/Dec target (near the Zenith, telescope east of the mount, for minimal offset in RA due to polar Azm misalignment).
-Slew to target.
-Use move commands to center target.
-Call A+. (records offsets, corrects RA/Dec)
+  Alignment commands
+  Align, polar alignment mode	:AP# 	Reply: [none]
+  Align, one-star*4	:A1# 	Reply: 0 or 1#
+  Align, two-star*4	:A2# 	Reply: 0 or 1#
+  Align, three-star*4	:A3# 	Reply: 0 or 1#
+  Align, accept*4 	:A+# 	Reply: 0 or 1#
+  4 = The one star alignment is implemented to correct RA/Dec offset. Two star alignment adds a second star to measure/correct for polar axis Altitude misalignment. Three star alignment adds a third star to measure/correct for polar axis Azimuth misalignment. These are saved when Set park is called and maintained when Parking/Unparking the mount. The sync. equatorial coordinates command refines the model for a local area of the sky, this refinement is lost when the power is cycled unless another Set park is called. The intended use of these commands is as follows...
+  Call A1. {or A2/A3.}
+  Set RA/Dec target (near the Zenith, telescope east of the mount, for minimal offset in RA due to polar Azm misalignment).
+  Slew to target.
+  Use move commands to center target.
+  Call A+. (records offsets, corrects RA/Dec)
 
-Continue for 2 or 3 star:
-Set RA/Dec target (near the Zenith, telescope west of the mount, for minimal offset in RA due to polar Azm misalignment).
-Slew to target.
-Use move commands to center target.
-Call A+. (records offset, corrects error in polar altitude)
+  Continue for 2 or 3 star:
+  Set RA/Dec target (near the Zenith, telescope west of the mount, for minimal offset in RA due to polar Azm misalignment).
+  Slew to target.
+  Use move commands to center target.
+  Call A+. (records offset, corrects error in polar altitude)
 
-Continue for 3 star:
-Set RA/Dec target (near pole altitude in southern sky, for maximum offset in RA due to polar azimuth misalignment).
-Slew to target.
-Use move commands to center target.
-Call A+. (records offset, corrects error in polar azimuth)
+  Continue for 3 star:
+  Set RA/Dec target (near pole altitude in southern sky, for maximum offset in RA due to polar azimuth misalignment).
+  Slew to target.
+  Use move commands to center target.
+  Call A+. (records offset, corrects error in polar azimuth)
 
-Park commands
-Set park position 	:hQ# 	Reply: 0 or 1#
-Move to park position 	:hP# 	Reply: 0 or 1#
-Restore parked telescope to operation	:hR#	Reply: 0 or 1#
+  Park commands
+  Set park position 	:hQ# 	Reply: 0 or 1#
+  Move to park position 	:hP# 	Reply: 0 or 1#
+  Restore parked telescope to operation	:hR#	Reply: 0 or 1#
 
-Home commands
-Set home (CWD) 	:hF# 	Reply: [none]
-Move to home (CWD) 	:hC# 	Reply: [none]
+  Home commands
+  Set home (CWD) 	:hF# 	Reply: [none]
+  Move to home (CWD) 	:hC# 	Reply: [none]
 
-Misc. commands
-Set baud rate:
-1=56.7K, 2=38.4K, 3=28.8K,
-4=19.2K, 5=14.4K, 6=9600,
-7=4800, 8=2400, 9=1200	:SBn# 	Reply: 0 or 1
-Precision toggle 	:P# 	Reply: [none]
-Get firmware date 	:GVD# 	Reply: MM DD YY#
-Get firmware time 	:GVT# 	Reply: HH:MM:SS#
-Get firmware number 	:GVN# 	Reply: 0.99a5#
-Get firmware name 	:GVP# 	Reply: On-Step#
-Get statUs returns:
-N-Not slewing, H-At Home position,
-P-Parked, p-Not parked, F-Park Failed,
-I-park In progress, R-PEC Recorded 	:GU# 	Reply: sss#
+  Misc. commands
+  Set baud rate:
+  1=56.7K, 2=38.4K, 3=28.8K,
+  4=19.2K, 5=14.4K, 6=9600,
+  7=4800, 8=2400, 9=1200	:SBn# 	Reply: 0 or 1
+  Precision toggle 	:P# 	Reply: [none]
+  Get firmware date 	:GVD# 	Reply: MM DD YY#
+  Get firmware time 	:GVT# 	Reply: HH:MM:SS#
+  Get firmware number 	:GVN# 	Reply: 0.99a5#
+  Get firmware name 	:GVP# 	Reply: On-Step#
+  Get statUs returns:
+  N-Not slewing, H-At Home position,
+  P-Parked, p-Not parked, F-Park Failed,
+  I-park In progress, R-PEC Recorded 	:GU# 	Reply: sss#
 */
 
 

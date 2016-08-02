@@ -77,29 +77,37 @@ void serialEvent() {
     if (inChar != ' ' )
     {
       pontBuffer = pontBuffer + 1;
-      Command[pontBuffer][pontCommand] = inChar;
+      Command[pontCommand][pontBuffer] = inChar;
     }
-    if (inChar == ':' && buffercmd[1] != 'S')
+    if (inChar == ':' && Command[1][pontCommand] != 'S')
     {
       pontBuffer = 0;
-      Command[pontBuffer][pontCommand] = inChar;
+      Command[pontCommand][pontBuffer] = inChar;
     }
     if (inChar == '#' &&  pontBuffer > 0 )
     {
       pontBuffer = pontBuffer + 1;
-      Command[pontBuffer][pontCommand] = inChar;
+      Command[pontCommand][pontBuffer] = inChar;
       pontBuffer = 0;
       pontCommand = pontCommand+1;
       if (pontCommand > 14 )
       {
         pontCommand=0;
       }
-      Command[pontBuffer][pontCommand]  = '@';
+      Command[pontCommand][pontBuffer]  = '@';
     }
     if (pontBuffer > 29)
     {
       pontBuffer = 0;
     }
+  }
+}
+
+void SerialPrintDebug(String str)
+{
+  if (flagDebug == 1)
+  {
+  Serial.print(str);
   }
 }
 

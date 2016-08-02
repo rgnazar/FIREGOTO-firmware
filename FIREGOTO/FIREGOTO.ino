@@ -6,6 +6,10 @@
 #include <Scheduler.h>
 #include <DueFlashStorage.h>
 
+//DEBUG
+int flagDebug = 0;
+
+
 //Criacao dos motores
 
 
@@ -74,16 +78,15 @@ int UTC;
 
 
 int fractime;
-unsigned long currentMillis, previousMillis, PCommadMillis, calculaRADECmountMillis = 0;
+unsigned long currentMillis, previousMillis, PrimeiroCommanMillis, calculaRADECmountMillis = 0;
 
 
 //Variaveis de controle para ler comandos LX200  ----------------------------------------------------------------------------------------------------------------
 boolean cmdComplete = false, doispontos = true; // whether the string is complete
 char buffercmd[15];
-char inputcmd[30];// a string to hold incoming data
 int pontBuffer = 0;
 int pontCommand = 0;
-int numCommand = 0, numCommandexec = 0;
+int numCommand = 0, numCommandexec = 0, flagCommand = 0;
 char Command[15][15];
 
 
@@ -178,7 +181,7 @@ void setup() {
   SerialPrint("00:00:00#"); //RTA para leitura do driver ASCOM da MEADE autostar I
   delay (200);
   previousMillis = millis();
-  PCommadMillis = previousMillis;
+  PrimeiroCommanMillis = previousMillis;
   ErroAlt = ErroAz = 44.0;
   ResolucaoeixoAltGrausDecimal = 360.0 / MaxPassoAlt ;
   ResolucaoeixoAzGrausDecimal = 360.0 / MaxPassoAz ;
@@ -193,16 +196,16 @@ void loop() {
   currentMillis = millis();
   CalcPosicaoPasso();
 
-  if (numCommand != numCommandexec)
+  if ((numCommand != numCommandexec) && (flagCommand == 0))
   {
     executecommand();
   }
 
-  if (PCommadMillis < currentMillis)
+  if (PrimeiroCommanMillis < currentMillis)
   {
     PrintLocalHora();
     Serial.println(String(Hora2DecHora(hour(), minute(), SegundoFracao), 10)) ;
-    PCommadMillis = PCommadMillis + 1001;
+    PrimeiroCommanMillis = PrimeiroCommanMillis + 1001;
   }
 
   if (calculaRADECmountMillis < currentMillis)
