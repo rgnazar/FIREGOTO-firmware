@@ -3,18 +3,16 @@
 void executecommand()
 {
   flagCommand = 1;
-  numCommandexec = numCommandexec  + 1;
-  if (numCommandexec > 14 )
-  {
-    numCommandexec = 0;
-  }
+  SerialPrintDebug(String(Command[numCommandexec][0])) ;
+
+  SerialPrintDebug(String(Command[numCommandexec])) ;
+
   if (cmdComplete) {
     PrimeiroCommanMillis = currentMillis + 5000;
-    SerialPrintDebug(String(Command[pontCommand][pontBuffer]));
     addbackslash();
-    if (Command[pontCommand][0] != ':')
+    if (Command[numCommandexec][0] != ':')
     {
-      if (Command[pontCommand][0] == 0x06)
+      if (Command[numCommandexec][0] == 0x06)
       {
         SerialPrint("A");
         /*
@@ -32,10 +30,10 @@ void executecommand()
       }
     }
     if (cmdComplete) {
-      if (Command[pontCommand][1] == '$') {
-        switch (Command[pontCommand][2]) {
+      if (Command[numCommandexec][1] == '$') {
+        switch (Command[numCommandexec][2]) {
           case 'B':
-            switch (Command[pontCommand][3]) {
+            switch (Command[numCommandexec][3]) {
               case 'D':
                 setDECbacklash();
                 break;
@@ -46,8 +44,8 @@ void executecommand()
 
         }
       }
-      if (Command[pontCommand][1] == 'C') {
-        switch (Command[pontCommand][2]) {
+      if (Command[numCommandexec][1] == 'C') {
+        switch (Command[numCommandexec][2]) {
           case 'S':
             synctelescope();
             break;
@@ -57,8 +55,8 @@ void executecommand()
 
         }
       }
-      if (Command[pontCommand][1] == 'G') {
-        switch (Command[pontCommand][2]) {
+      if (Command[numCommandexec][1] == 'G') {
+        switch (Command[numCommandexec][2]) {
           case 'A':
             printALTmount();
             break;
@@ -108,7 +106,7 @@ void executecommand()
             printAZmount();
             break;
           case 'V':
-            switch (Command[pontCommand][3]) {
+            switch (Command[numCommandexec][3]) {
               case 'D':
                 printFirmwareDate();
                 break;
@@ -129,34 +127,42 @@ void executecommand()
         }
       }
 
-      if (Command[pontCommand][1] == 'H') //set Hardware
+      if (Command[numCommandexec][1] == 'H') //set Hardware
       {
-        switch (Command[pontCommand][2]) {
+        switch (Command[numCommandexec][2]) {
           case 'S':
-            if (Command[pontCommand][4] == 'A')//:HSRA0000000#
+            if (Command[numCommandexec][4] == 'd')//:HSd#Off DEBUG
+            {
+              flagDebug = 0;
+            }
+            if (Command[numCommandexec][4] == 'D')//:HSD#On DEBUG
+            {
+              flagDebug = 1;
+            }
+            if (Command[numCommandexec][4] == 'A')//:HSRA0000000#
             {
               setMaxPassoAlt();
             }
-            if (Command[pontCommand][4] == 'B')//:HSRB0000000#
+            if (Command[numCommandexec][4] == 'B')//:HSRB0000000#
             {
               setMaxPassoAz();//:HSRB0000000#
             }
-            if (Command[pontCommand][3] == 'T')//:HST0000000#
+            if (Command[numCommandexec][3] == 'T')//:HST0000000#
             {
               setMinTimer(); //:HST0000000#
             }
             break;
 
           case 'G':
-            if (Command[pontCommand][4] == 'A')//:HGRA#
+            if (Command[numCommandexec][4] == 'A')//:HGRA#
             {
               getMaxPassoAlt();
             }
-            if (Command[pontCommand][4] == 'B')//:HGRB#
+            if (Command[numCommandexec][4] == 'B')//:HGRB#
             {
               getMaxPassoAz();//:HGRB#
             }
-            if (Command[pontCommand][3] == 'T')//:HGT#
+            if (Command[numCommandexec][3] == 'T')//:HGT#
             {
               getMinTimer(); //:HGT#
             }
@@ -164,8 +170,8 @@ void executecommand()
         }
       }
 
-      if (Command[pontCommand][1] == 'M') {
-        switch (Command[pontCommand][2]) {
+      if (Command[numCommandexec][1] == 'M') {
+        switch (Command[numCommandexec][2]) {
           case 'S':
             gototeleEQAR();
             break;
@@ -191,12 +197,12 @@ void executecommand()
         Set rate to Move 	:RM# 	Reply: [none]
         Set rate to Slew 	:RS# 	Reply: [none]
         Set rate to n (1-9)*3	:Rn# 	Reply: [none]   */
-      if (Command[pontCommand][1] == 'R') {
+      if (Command[numCommandexec][1] == 'R') {
         MoveRate();
       }
 
-      if (Command[pontCommand][1] == 'S') {
-        switch (Command[pontCommand][2]) {
+      if (Command[numCommandexec][1] == 'S') {
+        switch (Command[numCommandexec][2]) {
           case 'C':
             setLocalData();
             break;
@@ -240,13 +246,13 @@ void executecommand()
           High - Dec/Az/El displays and messages HH:MM:SS sDD*MM:SS
           Returns Nothing */
       }
-      if (Command[pontCommand][1] == 'U') {
+      if (Command[numCommandexec][1] == 'U') {
         SerialPrint("00:00:00#");
       }
 
-      if (Command[pontCommand][1] == 'Q') {
+      if (Command[numCommandexec][1] == 'Q') {
         Stoptelescope();
-        switch (Command[pontCommand][2]) {
+        switch (Command[numCommandexec][2]) {
           case 's':
             parasul();
             break;
@@ -271,8 +277,15 @@ void executecommand()
   }
 
   for (int j = 0; j < 15; j++) {
-    Command[pontCommand][j] = ' ';
+    Command[numCommandexec][j] = ' ';
   }
+  //Passa para o proximo
+  numCommandexec = numCommandexec  + 1;
+  if (numCommandexec > 14 )
+  {
+    numCommandexec = 0;
+  }
+
   flagCommand = 0;
   delay(1);
 }
@@ -280,7 +293,7 @@ void executecommand()
 void printerror()
 {
   SerialPrint("!#");
-  //Serial.println(Command[pontCommand][pontBuffer]);
+  //Serial.println(Command[numCommandexec][pontBuffer]);
 }
 
 void printHelp()
@@ -309,16 +322,16 @@ void printUTC() //:GG# Get UTC offset time Returns: sHH# or sHH.H#
 void setLocalData() //:SCMM/DD/YY# Change Handbox Date to MM/DD/YY #:SC 03/20/14#
 {
   String str = "";
-  str += Command[pontCommand][3];
-  str += Command[pontCommand][4];
+  str += Command[numCommandexec][3];
+  str += Command[numCommandexec][4];
   int mes = str.toInt();
   str = "";
-  str += Command[pontCommand][6];
-  str += Command[pontCommand][7];
+  str += Command[numCommandexec][6];
+  str += Command[numCommandexec][7];
   int dia = str.toInt();
   str = "";
-  str += Command[pontCommand][9];
-  str += Command[pontCommand][10];
+  str += Command[numCommandexec][9];
+  str += Command[numCommandexec][10];
   int ano = str.toInt();
   str = "";
   ano = ano + 2000;
@@ -350,16 +363,16 @@ void printDataLocal() //Get date 	:GC# 	 Reply: MM/DD/YY#
 void setLocalHora()//:SLHH:MM:SS#  Set the local Time
 {
   String str = "";
-  str += Command[pontCommand][3];
-  str += Command[pontCommand][4];
+  str += Command[numCommandexec][3];
+  str += Command[numCommandexec][4];
   int HH = str.toInt();
   str = "";
-  str += Command[pontCommand][6];
-  str += Command[pontCommand][7];
+  str += Command[numCommandexec][6];
+  str += Command[numCommandexec][7];
   int MM = str.toInt();
   str = "";
-  str += Command[pontCommand][9];
-  str += Command[pontCommand][10];
+  str += Command[numCommandexec][9];
+  str += Command[numCommandexec][10];
   int SS = str.toInt();
   str = "";
   int dia = day();
@@ -507,15 +520,15 @@ void setlatitude() //:StsDD*MM# Sets the current site latitude to sDD*MM# Return
 {
 
   String str = "";
-  str += Command[pontCommand][4];
-  str += Command[pontCommand][5];
+  str += Command[numCommandexec][4];
+  str += Command[numCommandexec][5];
   int DD = str.toInt();
   str = "";
-  str += Command[pontCommand][7];
-  str += Command[pontCommand][8];
+  str += Command[numCommandexec][7];
+  str += Command[numCommandexec][8];
   int MM = str.toInt();
   str = "";
-  if (Command[pontCommand][3] == '-')
+  if (Command[numCommandexec][3] == '-')
   {
     DD = DD * (-1);
   }
@@ -546,16 +559,16 @@ void setlongitude() //:SgsDDD*MM# Set current site's longitude to DDD*MM an ASCI
 //NO PROTOCOLO DA MEADE O SINAL ÃƒË† AO CONTRARIO
 {
   String str = "";
-  str += Command[pontCommand][4];
-  str += Command[pontCommand][5];
-  str += Command[pontCommand][6];
+  str += Command[numCommandexec][4];
+  str += Command[numCommandexec][5];
+  str += Command[numCommandexec][6];
   int DD = str.toInt();
   str = "";
-  str += Command[pontCommand][8];
-  str += Command[pontCommand][9];
+  str += Command[numCommandexec][8];
+  str += Command[numCommandexec][9];
   int MM = str.toInt();
   str = "";
-  if (Command[pontCommand][3] != '-')
+  if (Command[numCommandexec][3] != '-')
   {
     DD = DD * (-1);
   }
@@ -671,8 +684,8 @@ void printHorizonteLimite() //:Go# Get Lower Limit Returns: DD*#
 void setAlturaLimite() //:Sh DD# Set the maximum object elevation limit to DD#
 {
   String str = "";
-  str += Command[pontCommand][4];
-  str += Command[pontCommand][5];
+  str += Command[numCommandexec][4];
+  str += Command[numCommandexec][5];
   AltitudeLimite = str.toInt();
   str = "";
   SerialPrint("1");
@@ -681,8 +694,8 @@ void setAlturaLimite() //:Sh DD# Set the maximum object elevation limit to DD#
 void setHorizonteLimite() //:SoDD*# Set lowest elevation to which the telescope will slew
 {
   String str = "";
-  str += Command[pontCommand][4];
-  str += Command[pontCommand][5];
+  str += Command[numCommandexec][4];
+  str += Command[numCommandexec][5];
   HorizonteLimite = str.toInt();
   str = "";
   SerialPrint(String(HorizonteLimite));
@@ -698,8 +711,8 @@ void setObservatorioNome() // Set site 0 name 	:SMsss...# 	Reply: 0 or 1#
 {
   String str = "";
   int i = 4;
-  while (Command[pontCommand][i] != '#')
-  { str += Command[pontCommand][i];
+  while (Command[numCommandexec][i] != '#')
+  { str += Command[numCommandexec][i];
     i++;
   }
   str.toCharArray(  configuration.Local, sizeof(str));
@@ -709,10 +722,10 @@ void setObservatorioNome() // Set site 0 name 	:SMsss...# 	Reply: 0 or 1#
 void setHoraparaUTC() //:SG-03# :SGsHH.H# Set the number of hours added to local time to yield UTC
 {
   String str = "";
-  str += Command[pontCommand][4];
-  str += Command[pontCommand][5];
+  str += Command[numCommandexec][4];
+  str += Command[numCommandexec][5];
   UTC = str.toInt();
-  if (Command[pontCommand][3] == '-')
+  if (Command[numCommandexec][3] == '-')
   {
     UTC = UTC * -1;
   }
@@ -733,16 +746,16 @@ void setRAAlvo() //:Sr03:43:56# Set target RA 	:SrHH:MM:SS# * 	Reply: 0 or 1#
 {
   ativaacom = 0;
   String str = "";
-  str += Command[pontCommand][3];
-  str += Command[pontCommand][4];
+  str += Command[numCommandexec][3];
+  str += Command[numCommandexec][4];
   int HH = str.toInt();
   str = "";
-  str += Command[pontCommand][6];
-  str += Command[pontCommand][7];
+  str += Command[numCommandexec][6];
+  str += Command[numCommandexec][7];
   int MM = str.toInt();
   str = "";
-  str += Command[pontCommand][9];
-  str += Command[pontCommand][10];
+  str += Command[numCommandexec][9];
+  str += Command[numCommandexec][10];
   int SS = str.toInt();
   str = "";
   RAAlvo = Hours2DecDegrees(HH, MM, SS);
@@ -754,20 +767,20 @@ void setDECAlvo() //Set target Dec 	:SdsDD:MM:SS# *	Reply: 0 or 1#
 {
   ativaacom = 0;
   String str = "";
-  str += Command[pontCommand][4];
-  str += Command[pontCommand][5];
+  str += Command[numCommandexec][4];
+  str += Command[numCommandexec][5];
   int DD = str.toInt();
   str = "";
-  str += Command[pontCommand][7];
-  str += Command[pontCommand][8];
+  str += Command[numCommandexec][7];
+  str += Command[numCommandexec][8];
   int MM = str.toInt();
   str = "";
-  str += Command[pontCommand][10];
-  str += Command[pontCommand][11];
+  str += Command[numCommandexec][10];
+  str += Command[numCommandexec][11];
   int SS = str.toInt();
   DECAlvo = DegMinSec2DecDeg(DD, MM, SS);
   str = "";
-  if (Command[pontCommand][3] == '-')
+  if (Command[numCommandexec][3] == '-')
   {
     DECAlvo = DECAlvo * (-1);
   }
@@ -812,13 +825,13 @@ void synctelescopeString() //:CM# Synchronizes the telescope position with targe
 void setRAbacklash ()// Set RA backlash amount (in ArcSec)	:$BRnnn# 	Reply: 0 or 1#
 {
   String str = "";
-  str += Command[pontCommand][4];
-  if (Command[pontCommand][5] != '#')
+  str += Command[numCommandexec][4];
+  if (Command[numCommandexec][5] != '#')
   {
-    str += Command[pontCommand][5];
-    if (Command[pontCommand][6] != '#')
+    str += Command[numCommandexec][5];
+    if (Command[numCommandexec][6] != '#')
     {
-      str += Command[pontCommand][6];
+      str += Command[numCommandexec][6];
     }
   }
   RAbacklash = str.toInt();
@@ -831,13 +844,13 @@ void setDECbacklash ()// Set Dec backlash amount (in ArcSec)	:$BDnnn#	Reply: 0 o
 
 {
   String str = "";
-  str += Command[pontCommand][4];
-  if (Command[pontCommand][5] != '#')
+  str += Command[numCommandexec][4];
+  if (Command[numCommandexec][5] != '#')
   {
-    str += Command[pontCommand][5];
-    if (Command[pontCommand][6] != '#')
+    str += Command[numCommandexec][5];
+    if (Command[numCommandexec][6] != '#')
     {
-      str += Command[pontCommand][6];
+      str += Command[numCommandexec][6];
     }
   }
   DECbacklash = str.toInt();
@@ -960,7 +973,7 @@ void parasul()
 void MoveRate()
 {
   int ratepadrao = (int)(MaxPassoAz / 86400);
-  switch (Command[pontCommand][2]) {
+  switch (Command[numCommandexec][2]) {
     case '0':
       accel = ratepadrao * 2;
       break;
@@ -1007,13 +1020,13 @@ void MoveRate()
 void setMaxPassoAlt()  //:HSRA0000000#
 {
   String str = "";
-  str += Command[pontCommand][5];
-  str += Command[pontCommand][6];
-  str += Command[pontCommand][7];
-  str += Command[pontCommand][8];
-  str += Command[pontCommand][9];
-  str += Command[pontCommand][10];
-  str += Command[pontCommand][11];
+  str += Command[numCommandexec][5];
+  str += Command[numCommandexec][6];
+  str += Command[numCommandexec][7];
+  str += Command[numCommandexec][8];
+  str += Command[numCommandexec][9];
+  str += Command[numCommandexec][10];
+  str += Command[numCommandexec][11];
   unsigned int SS = str.toInt();
   configurationFromFlash.MaxPassoAlt = SS;
   MaxPassoAlt = configurationFromFlash.MaxPassoAlt;
@@ -1028,13 +1041,13 @@ void setMaxPassoAlt()  //:HSRA0000000#
 void setMaxPassoAz() //:HSRB0000000#
 {
   String str = "";
-  str += Command[pontCommand][5];
-  str += Command[pontCommand][6];
-  str += Command[pontCommand][7];
-  str += Command[pontCommand][8];
-  str += Command[pontCommand][9];
-  str += Command[pontCommand][10];
-  str += Command[pontCommand][11];
+  str += Command[numCommandexec][5];
+  str += Command[numCommandexec][6];
+  str += Command[numCommandexec][7];
+  str += Command[numCommandexec][8];
+  str += Command[numCommandexec][9];
+  str += Command[numCommandexec][10];
+  str += Command[numCommandexec][11];
   unsigned int SS = str.toInt();
   configurationFromFlash.MaxPassoAz = SS;
   MaxPassoAz = configurationFromFlash.MaxPassoAz;
@@ -1048,13 +1061,13 @@ void setMaxPassoAz() //:HSRB0000000#
 void setMinTimer() //:HST0000000#
 {
   String str = "";
-  str += Command[pontCommand][6];
-  str += Command[pontCommand][7];
-  str += Command[pontCommand][8];
-  str += Command[pontCommand][9];
-  str += Command[pontCommand][10];
-  str += Command[pontCommand][11];
-  str += Command[pontCommand][12];
+  str += Command[numCommandexec][6];
+  str += Command[numCommandexec][7];
+  str += Command[numCommandexec][8];
+  str += Command[numCommandexec][9];
+  str += Command[numCommandexec][10];
+  str += Command[numCommandexec][11];
+  str += Command[numCommandexec][12];
   unsigned int SS = str.toInt();
   configurationFromFlash.MinTimer = SS + 150;
   MinTimer = configurationFromFlash.MinTimer ;  //valor minimo

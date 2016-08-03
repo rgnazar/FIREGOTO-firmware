@@ -83,9 +83,7 @@ unsigned long currentMillis, previousMillis, PrimeiroCommanMillis, calculaRADECm
 
 //Variaveis de controle para ler comandos LX200  ----------------------------------------------------------------------------------------------------------------
 boolean cmdComplete = false, doispontos = true; // whether the string is complete
-char buffercmd[15];
 int pontBuffer = 0;
-int pontCommand = 0;
 int numCommand = 0, numCommandexec = 0, flagCommand = 0;
 char Command[15][15];
 
@@ -138,7 +136,8 @@ double Microssegundo = 0 , SegundoFracao = 0.0, MilissegundoSeg = 0.0, Milissegu
 
 void setup() {
   Serial.begin(9600);
-  Serial3.begin(9600);
+  SerialUSB.begin(9600);
+
   Scheduler.startLoop(loop1);
 
   /* Flash is erased every time new code is uploaded. Write the default configuration to flash if first time */
@@ -195,16 +194,23 @@ void setup() {
 void loop() {
   currentMillis = millis();
   CalcPosicaoPasso();
+  if (SerialUSB.available() || Serial.available()) serialEvent();
 
   if ((numCommand != numCommandexec) && (flagCommand == 0))
   {
+   SerialPrintDebug(String(numCommandexec));
+    SerialPrintDebug(String(numCommand));
+
+    cmdComplete = true;
     executecommand();
+   SerialPrintDebug(String(numCommandexec));
+    SerialPrintDebug(String(numCommand));
   }
 
   if (PrimeiroCommanMillis < currentMillis)
   {
     PrintLocalHora();
-    Serial.println(String(Hora2DecHora(hour(), minute(), SegundoFracao), 10)) ;
+    SerialPrintDebug(String(Hora2DecHora(hour(), minute(), SegundoFracao), 10)) ;
     PrimeiroCommanMillis = PrimeiroCommanMillis + 1001;
   }
 
