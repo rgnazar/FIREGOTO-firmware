@@ -186,3 +186,6 @@ Driver ASCOM esta em :http://www.stellarjourney.com/index.php?r=site/software_te
 
 
 GNU AFFERO GENERAL PUBLIC LICENSE https://github.com/rgnazar/FIREGOTO-firmware/blob/master/LICENSE.md
+
+
+https://github.com/juanrmn/Arduino-Telescope-Control/blob/master/main/arduino/plaser/CoordsLib.h
