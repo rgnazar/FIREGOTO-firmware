@@ -34,7 +34,9 @@
 void SerialPrint(String str)
 {
   Serial.print(str);
+  Serial3.print(str);
   SerialUSB.print(str);
+  ledStateB = HIGH;
 }
 
 /*
@@ -79,7 +81,7 @@ void serialEvent() {
       Command[numCommand][pontBuffer] = inChar;
       pontBuffer = pontBuffer + 1;
     }
-    if (inChar == ':'  && Command[numCommand][0] != 'S')
+    if (inChar == ':'  && Command[numCommand][1] != 'S')
     {
       pontBuffer = 0;
       Command[numCommand][0] = inChar;
@@ -91,6 +93,28 @@ void serialEvent() {
       numCommand = numCommand + 1;
     }
   }
+
+  while (Serial3.available()) {
+    // get the new byte:
+    char inChar = (char)Serial3.read();
+    if (inChar != ' ' )
+    {
+      Command[numCommand][pontBuffer] = inChar;
+      pontBuffer = pontBuffer + 1;
+    }
+    if (inChar == ':'  && Command[numCommand][1] != 'S')
+    {
+      pontBuffer = 0;
+      Command[numCommand][0] = inChar;
+      pontBuffer = pontBuffer + 1;
+    }
+    if (inChar == '#')
+    {
+      pontBuffer = 0;
+      numCommand = numCommand + 1;
+    }
+  }
+
   while (SerialUSB.available()) {
     // get the new byte:
     char inChar = (char)SerialUSB.read();
@@ -99,7 +123,7 @@ void serialEvent() {
       Command[numCommand][pontBuffer] = inChar;
       pontBuffer = pontBuffer + 1;
     }
-    if (inChar == ':'  && Command[numCommand][0] != 'S')
+    if (inChar == ':'  && Command[numCommand][1] != 'S')
     {
       pontBuffer = 0;
       Command[numCommand][0] = inChar;
@@ -126,7 +150,7 @@ void SerialPrintDebug(String str)
   if (flagDebug == 1)
   {
     Serial.println(str);
-    SerialUSB.println(str);
+    // SerialUSB.println(str);
   }
 }
 

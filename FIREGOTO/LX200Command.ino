@@ -131,25 +131,41 @@ void executecommand()
       {
         switch (Command[numCommandexec][2]) {
           case 'S':
-            if (Command[numCommandexec][4] == 'd')//:HSd#Off DEBUG
+            if (Command[numCommandexec][3] == 'd')//:HSd#Off DEBUG
             {
               flagDebug = 0;
             }
-            if (Command[numCommandexec][4] == 'D')//:HSD#On DEBUG
+            if (Command[numCommandexec][3] == 'D')//:HSD#On DEBUG
             {
               flagDebug = 1;
             }
-            if (Command[numCommandexec][4] == 'A')//:HSRA0000000#
+            if (Command[numCommandexec][4] == 'L') //:HSAL0000000#
             {
               setMaxPassoAlt();
             }
-            if (Command[numCommandexec][4] == 'B')//:HSRB0000000#
+            if (Command[numCommandexec][4] == 'Z') //:HSAZ0000000#
             {
               setMaxPassoAz();//:HSRB0000000#
             }
-            if (Command[numCommandexec][3] == 'T')//:HST0000000#
+            if (Command[numCommandexec][3] == 'T') //:HST0000000#
             {
-              setMinTimer(); //:HST0000000#
+              setMinTimer();
+            }
+            if (Command[numCommandexec][8] == 'N') //:HSETUPON#
+            {
+              RotinadeSetup();
+            }
+            if (Command[numCommandexec][8] == 'F') //:HSETUPOFF#
+            {
+              RotinadeSetupOff();
+            }
+            if (Command[numCommandexec][5] == 'A') //:HSSRA0#
+            {
+            setSentidoRA(); //:HSSRA0#
+            }
+            if (Command[numCommandexec][5] == 'E') //:HSSDEC0#
+            {
+             setSentidoDEC(); //:HSSDEC0#
             }
             break;
 
@@ -335,7 +351,7 @@ void setLocalData() //:SCMM/DD/YY# Change Handbox Date to MM/DD/YY #:SC 03/20/14
   int ano = str.toInt();
   str = "";
   ano = ano + 2000;
-  int tmp = -UTC * 60 * 60;
+  int tmp = UTC * 60 * 60;
   adjustTime(-tmp);
   int HH = hour();
   int MM = minute();
@@ -380,7 +396,7 @@ void setLocalHora()//:SLHH:MM:SS#  Set the local Time
   int ano = year();
   setTime(HH, MM, SS, dia, mes, ano);
   int tmp = UTC * 60 * 60;
-  adjustTime(tmp);
+  adjustTime(-tmp);
   SerialPrint("1");
   configurationFromFlash.DataHora =  now();
   byte b2[sizeof(Configuration)]; // create byte array to store the struct
@@ -704,7 +720,10 @@ void setHorizonteLimite() //:SoDD*# Set lowest elevation to which the telescope 
 
 void printObservatorioNome() //:GM# Get Site 1 Name Returns: <string>#
 {
-  SerialPrint(configuration.Local);
+  String str = "";
+  str += "Minha Casa";
+  str += "#";
+  SerialPrint(str);
 }
 
 void setObservatorioNome() // Set site 0 name 	:SMsss...# 	Reply: 0 or 1#
@@ -729,6 +748,7 @@ void setHoraparaUTC() //:SG-03# :SGsHH.H# Set the number of hours added to local
   {
     UTC = UTC * -1;
   }
+  UTC = UTC * -1;
   SerialPrint("1");
 }
 
@@ -1003,15 +1023,19 @@ void MoveRate()
       break;
 
     case 'G':
+      AltaResolucao();
       accel = ratepadrao * 2;
       break;
     case 'C':
+      AltaResolucao();
       accel = ratepadrao * 8;
       break;
     case 'M':
+      AltaResolucao();
       accel = ratepadrao * 128;
       break;
     case 'S':
+      BaixaResolucao();
       accel = ratepadrao * 128000;
       break;
   }
@@ -1058,26 +1082,53 @@ void setMaxPassoAz() //:HSRB0000000#
 
 }
 
-void setMinTimer() //:HST0000000#
+void setMinTimer() //:HST00000#
 {
   String str = "";
+  str += Command[numCommandexec][4];
+  str += Command[numCommandexec][5];
   str += Command[numCommandexec][6];
   str += Command[numCommandexec][7];
   str += Command[numCommandexec][8];
-  str += Command[numCommandexec][9];
-  str += Command[numCommandexec][10];
-  str += Command[numCommandexec][11];
-  str += Command[numCommandexec][12];
   unsigned int SS = str.toInt();
-  configurationFromFlash.MinTimer = SS + 150;
+  configurationFromFlash.MinTimer = SS + 200;
   MinTimer = configurationFromFlash.MinTimer ;  //valor minimo
   byte b2[sizeof(Configuration)]; // create byte array to store the struct
   memcpy(b2, &configurationFromFlash, sizeof(Configuration)); // copy the struct to the byte array
   dueFlashStorage.write(4, b2, sizeof(Configuration)); // write byte array to flash
+  Timer3.stop();
+  Timer3.start(MinTimer);
+
   SerialPrint("1");
-
-
 }
+
+void setSentidoRA() //:HSSRA0#
+{
+  String str = "";
+  str += Command[numCommandexec][6];
+  unsigned int RA = str.toInt();
+  configurationFromFlash.SentidoRA = RA;
+  SentidoRA = configurationFromFlash.SentidoRA;
+  byte b2[sizeof(Configuration)]; // create byte array to store the struct
+  memcpy(b2, &configurationFromFlash, sizeof(Configuration)); // copy the struct to the byte array
+  dueFlashStorage.write(4, b2, sizeof(Configuration)); // write byte array to flash
+  SentidodosMotores();
+  SerialPrint("1");
+}
+void setSentidoDEC() //:HSSDEC0#
+{
+  String str = "";
+  str += Command[numCommandexec][7];
+  unsigned int Dec = str.toInt();
+  configurationFromFlash.SentidoDEC = Dec;
+  SentidoDEC = configurationFromFlash.SentidoDEC;
+  byte b2[sizeof(Configuration)]; // create byte array to store the struct
+  memcpy(b2, &configurationFromFlash, sizeof(Configuration)); // copy the struct to the byte array
+  dueFlashStorage.write(4, b2, sizeof(Configuration)); // write byte array to flash
+  SentidodosMotores();
+  SerialPrint("1");
+}
+
 
 void getMaxPassoAlt()  //:HGRA#
 {
@@ -1099,6 +1150,7 @@ void getMinTimer() //:HGT#
   sprintf(str, "%07d#", int(MinTimer));
   SerialPrint(str);
 }
+
 
 
 /*
