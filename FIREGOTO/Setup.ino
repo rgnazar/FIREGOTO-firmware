@@ -4,12 +4,12 @@ void RotinadeSetup() //:HSETUPON#
   if (setupflag == 0)
   {
     SerialPrint(" \n Rotina inicial de Setup \n ");
-    digitalWrite(MotorRA_M2, LOW);
-    digitalWrite(MotorRA_M1, LOW);
-    digitalWrite(MotorRA_M0, HIGH);
-    digitalWrite(MotorDEC_M2, LOW);
-    digitalWrite(MotorDEC_M1, LOW);
-    digitalWrite(MotorDEC_M0, HIGH);
+    digitalWrite(MotorALT_M2, LOW);
+    digitalWrite(MotorALT_M1, LOW);
+    digitalWrite(MotorALT_M0, HIGH);
+    digitalWrite(MotorAZ_M2, LOW);
+    digitalWrite(MotorAZ_M1, LOW);
+    digitalWrite(MotorAZ_M0, HIGH);
   }
   setupflag = 2;
 

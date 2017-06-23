@@ -1,40 +1,40 @@
 void IniciaMotores()
 {
   //Iniciar as variaveis do motor de passo
-  pinMode(MotorRA_Direcao, OUTPUT);
-  pinMode(MotorRA_Passo, OUTPUT);
-  pinMode(MotorRA_Sleep, OUTPUT);
-  pinMode(MotorRA_Reset, OUTPUT);
-  pinMode(MotorRA_M2, OUTPUT);
-  pinMode(MotorRA_M1, OUTPUT);
-  pinMode(MotorRA_M0, OUTPUT);
-  pinMode(MotorRA_Ativa, OUTPUT);
-  pinMode(MotorDEC_Direcao, OUTPUT);
-  pinMode(MotorDEC_Passo, OUTPUT);
-  pinMode(MotorDEC_Sleep, OUTPUT);
-  pinMode(MotorDEC_Reset, OUTPUT);
-  pinMode(MotorDEC_M2, OUTPUT);
-  pinMode(MotorDEC_M1, OUTPUT);
-  pinMode(MotorDEC_M0, OUTPUT);
-  pinMode(MotorDEC_Ativa, OUTPUT);
+  pinMode(MotorALT_Direcao, OUTPUT);
+  pinMode(MotorALT_Passo, OUTPUT);
+  pinMode(MotorALT_Sleep, OUTPUT);
+  pinMode(MotorALT_Reset, OUTPUT);
+  pinMode(MotorALT_M2, OUTPUT);
+  pinMode(MotorALT_M1, OUTPUT);
+  pinMode(MotorALT_M0, OUTPUT);
+  pinMode(MotorALT_Ativa, OUTPUT);
+  pinMode(MotorAZ_Direcao, OUTPUT);
+  pinMode(MotorAZ_Passo, OUTPUT);
+  pinMode(MotorAZ_Sleep, OUTPUT);
+  pinMode(MotorAZ_Reset, OUTPUT);
+  pinMode(MotorAZ_M2, OUTPUT);
+  pinMode(MotorAZ_M1, OUTPUT);
+  pinMode(MotorAZ_M0, OUTPUT);
+  pinMode(MotorAZ_Ativa, OUTPUT);
 
   //Aciona os pinos por padrão
-  digitalWrite(MotorRA_Direcao, LOW);
-  digitalWrite(MotorRA_Passo, LOW);
-  digitalWrite(MotorRA_Sleep, HIGH);
-  digitalWrite(MotorRA_Reset, HIGH);
-  digitalWrite(MotorRA_M2, HIGH);
-  digitalWrite(MotorRA_M1, HIGH);
-  digitalWrite(MotorRA_M0, HIGH);
-  digitalWrite(MotorRA_Ativa, LOW);
-  digitalWrite(MotorDEC_Direcao, LOW);
-  digitalWrite(MotorDEC_Passo, LOW);
-  digitalWrite(MotorDEC_Sleep, HIGH);
-  digitalWrite(MotorDEC_Reset, HIGH);
-  digitalWrite(MotorDEC_M2, HIGH);
-  digitalWrite(MotorDEC_M1, HIGH );
-  digitalWrite(MotorDEC_M0, HIGH);
-  digitalWrite(MotorDEC_Ativa, LOW);
+  digitalWrite(MotorALT_Direcao, LOW);
+  digitalWrite(MotorALT_Passo, LOW);
+  digitalWrite(MotorALT_Sleep, HIGH);
+  digitalWrite(MotorALT_Reset, HIGH);
+  digitalWrite(MotorALT_M2, HIGH);
+  digitalWrite(MotorALT_M1, HIGH);
+  digitalWrite(MotorALT_M0, HIGH);
+  digitalWrite(MotorALT_Ativa, LOW);
+  digitalWrite(MotorAZ_Direcao, LOW);
+  digitalWrite(MotorAZ_Passo, LOW);
+  digitalWrite(MotorAZ_Sleep, HIGH);
+  digitalWrite(MotorAZ_Reset, HIGH);
+  digitalWrite(MotorAZ_M2, HIGH);
+  digitalWrite(MotorAZ_M1, HIGH );
+  digitalWrite(MotorAZ_M0, HIGH);
+  digitalWrite(MotorAZ_Ativa, LOW);
 
   AltMotor.setMaxSpeed(dMaxSpeedAlt);
   AltMotor.setAcceleration(32);
@@ -160,29 +160,6 @@ void SetPosition()
   AzMotor.moveTo((int)AZmountAlvo);
 }
 
-void AlteraMicroSeg() {
-
-
-  //Cria MicroSeg Virtusal
-  Segundo = second();
-  if (MilissegundoSeg == Segundo)
-  {
-    Microssegundo =  Microssegundo + MinTimer;
-    if (Microssegundo > 999999)
-    {
-      Microssegundo = 999999;
-    }
-    SegundoFracao = Microssegundo * 0.000001;
-    SegundoFracao = SegundoFracao + Segundo;
-  }
-  else
-  {
-    MilissegundoSeg = Segundo;
-    Microssegundo = 1;
-  }
-}
-
-
 
 int paramotors()
 {
@@ -198,12 +175,12 @@ void BaixaResolucao ()
   {
     MaxPassoAz = dMaxPassoAz / 32;
     MaxPassoAlt = dMaxPassoAlt / 32;
-    digitalWrite(MotorRA_M2, LOW);
-    digitalWrite(MotorRA_M1, LOW);
-    digitalWrite(MotorRA_M0, HIGH);
-    digitalWrite(MotorDEC_M2, LOW);
-    digitalWrite(MotorDEC_M1, LOW );
-    digitalWrite(MotorDEC_M0, HIGH);
+    digitalWrite(MotorALT_M2, LOW);
+    digitalWrite(MotorALT_M1, LOW);
+    digitalWrite(MotorALT_M0, HIGH);
+    digitalWrite(MotorAZ_M2, LOW);
+    digitalWrite(MotorAZ_M1, LOW );
+    digitalWrite(MotorAZ_M0, HIGH);
     AltMotor.setCurrentPosition((int)AltMotor.currentPosition() / 32);
     AzMotor.setCurrentPosition((int)AzMotor.currentPosition() / 32);
     AltMotor.setAcceleration(32 * 4);
@@ -218,9 +195,9 @@ void BaixaResolucaoAz ()
   if ( MaxPassoAz == dMaxPassoAz)
   {
     MaxPassoAz = dMaxPassoAz / 32;
-    digitalWrite(MotorDEC_M2, LOW);
-    digitalWrite(MotorDEC_M1, LOW );
-    digitalWrite(MotorDEC_M0, HIGH);
+    digitalWrite(MotorAZ_M2, LOW);
+    digitalWrite(MotorAZ_M1, LOW );
+    digitalWrite(MotorAZ_M0, HIGH);
     AzMotor.setCurrentPosition((int)AzMotor.currentPosition() / 32);
     AzMotor.setAcceleration(32 * 4);
     CalculaResolucao();
@@ -233,9 +210,9 @@ void BaixaResolucaoAlt ()
   if ( MaxPassoAlt == dMaxPassoAlt)
   {
     MaxPassoAlt = dMaxPassoAlt / 32;
-    digitalWrite(MotorRA_M2, LOW);
-    digitalWrite(MotorRA_M1, LOW);
-    digitalWrite(MotorRA_M0, HIGH);
+    digitalWrite(MotorALT_M2, LOW);
+    digitalWrite(MotorALT_M1, LOW);
+    digitalWrite(MotorALT_M0, HIGH);
     AltMotor.setCurrentPosition((int)AltMotor.currentPosition() / 32);
     AltMotor.setAcceleration(32 * 4);
     CalculaResolucao();
@@ -250,12 +227,12 @@ void AltaResolucao ()
   {
     MaxPassoAz = dMaxPassoAz;
     MaxPassoAlt = dMaxPassoAlt;
-    digitalWrite(MotorRA_M2, HIGH);
-    digitalWrite(MotorRA_M1, HIGH);
-    digitalWrite(MotorRA_M0, HIGH);
-    digitalWrite(MotorDEC_M2, HIGH);
-    digitalWrite(MotorDEC_M1, HIGH);
-    digitalWrite(MotorDEC_M0, HIGH);
+    digitalWrite(MotorALT_M2, HIGH);
+    digitalWrite(MotorALT_M1, HIGH);
+    digitalWrite(MotorALT_M0, HIGH);
+    digitalWrite(MotorAZ_M2, HIGH);
+    digitalWrite(MotorAZ_M1, HIGH);
+    digitalWrite(MotorAZ_M0, HIGH);
     AltMotor.setCurrentPosition((int)AltMotor.currentPosition() * 32);
     AzMotor.setCurrentPosition((int)AzMotor.currentPosition() * 32);
     CalculaResolucao();
@@ -270,9 +247,9 @@ void AltaResolucaoAz ()
   if ( MaxPassoAz != dMaxPassoAz)
   {
     MaxPassoAz = dMaxPassoAz;
-    digitalWrite(MotorDEC_M2, HIGH);
-    digitalWrite(MotorDEC_M1, HIGH);
-    digitalWrite(MotorDEC_M0, HIGH);
+    digitalWrite(MotorAZ_M2, HIGH);
+    digitalWrite(MotorAZ_M1, HIGH);
+    digitalWrite(MotorAZ_M0, HIGH);
     AzMotor.setCurrentPosition((int)AzMotor.currentPosition() * 32);
     CalculaResolucao();
     CalcPosicaoPasso();
@@ -285,9 +262,9 @@ void AltaResolucaoAlt ()
   if ( MaxPassoAlt != dMaxPassoAlt)
   {
     MaxPassoAlt = dMaxPassoAlt;
-    digitalWrite(MotorRA_M2, HIGH);
-    digitalWrite(MotorRA_M1, HIGH);
-    digitalWrite(MotorRA_M0, HIGH);
+    digitalWrite(MotorALT_M2, HIGH);
+    digitalWrite(MotorALT_M1, HIGH);
+    digitalWrite(MotorALT_M0, HIGH);
     AltMotor.setCurrentPosition((int)AltMotor.currentPosition() * 32);
     CalculaResolucao();
     CalcPosicaoPasso();

@@ -11,29 +11,36 @@ int flagDebug = 0;
 
 
 //Criacao dos motores
+#define MotorALT_Direcao 22
+#define MotorALT_Passo 24
+#define MotorALT_Sleep 26
+#define MotorALT_Reset 28
+#define MotorALT_M2 30
+#define MotorALT_M1 32
+#define MotorALT_M0 34
+#define MotorALT_Ativa 36
+#define MotorAZ_Direcao 38
+#define MotorAZ_Passo 40
+#define MotorAZ_Sleep 42
+#define MotorAZ_Reset 44
+#define MotorAZ_M2 46
+#define MotorAZ_M1 48
+#define MotorAZ_M0 50
+#define MotorAZ_Ativa 52
 
 
-#define MotorRA_Direcao 22
-#define MotorRA_Passo 24
-#define MotorRA_Sleep 26
-#define MotorRA_Reset 28
-#define MotorRA_M2 30
-#define MotorRA_M1 32
-#define MotorRA_M0 34
-#define MotorRA_Ativa 36
-#define MotorDEC_Direcao 38
-#define MotorDEC_Passo 40
-#define MotorDEC_Sleep 42
-#define MotorDEC_Reset 44
-#define MotorDEC_M2 46
-#define MotorDEC_M1 48
-#define MotorDEC_M0 50
-#define MotorDEC_Ativa 52
-
-
-AccelStepper AzMotor(AccelStepper::DRIVER, MotorRA_Passo, MotorRA_Direcao);
-AccelStepper AltMotor(AccelStepper::DRIVER, MotorDEC_Passo, MotorDEC_Direcao);
+AccelStepper AltMotor(AccelStepper::DRIVER, MotorALT_Passo, MotorALT_Direcao);
+AccelStepper AzMotor(AccelStepper::DRIVER, MotorAZ_Passo, MotorAZ_Direcao);
 int accel = 1;
+
+
+//LEDs
+#define LedB 53
+#define LedR 51
+#define LedG 49
+int ledStateR = LOW;
+int ledStateB = LOW;
+int ledStateG = LOW;
 
 
 /*valores maximo para o passo (Valor ideal 1286400)*/
@@ -42,15 +49,9 @@ double dMaxPassoAz = 3844654; /*/valor de resolucao AR = Passo * MicroPasso * re
 int dMinTimer = 500; /*/passo*/
 double dMaxSpeedAlt = 3844654;
 double dMaxSpeedAz = 3844654;
-/*
-  // Location ----------------------------------------------------------------------------------------------------------------
-  double latitude  = -25.40;
-  double longitude = -49.20;
-  int UTC = 0;
-  setTime(22, 00, 00, 23, 03, 2014);
-*/
 
 
+//Variaveis de persistencia e estrutura de dados ----------------------------------------------------------------------------------------------------------------
 DueFlashStorage dueFlashStorage;
 
 // The struct of the configuration.
@@ -93,13 +94,7 @@ int pontBuffer = 0;
 int numCommand = 0, numCommandexec = 0, flagCommand = 0;
 char Command[15][15];
 
-//LEDs
-#define LedB 53
-#define LedR 51
-#define LedG 49
-int ledStateR = LOW;
-int ledStateB = LOW;
-int ledStateG = LOW;
+
 
 //Variaveis do SETUP
 int setupflag = 0;
@@ -200,6 +195,9 @@ void setup() {
   else {
     Serial.println("no");
   }
+
+
+  
   byte* b = dueFlashStorage.readAddress(4); // byte array which is read from flash at adress 4
   memcpy(&configurationFromFlash, b, sizeof(Configuration)); // copy byte array to temporary struct
   MaxPassoAlt = configurationFromFlash.MaxPassoAlt;
