@@ -433,6 +433,13 @@ void printOperatocao()
 {
   SerialPrint("N#");
 }
+
+
+
+void printalinhamento() //:GW# with "AN0#"
+{
+  SerialPrint("AN0#");
+}
 /*std Autostars return "Autostar"
   LX200s return "LX2001"
   RCXs return "RCX400"
@@ -468,18 +475,6 @@ void printSideralHora()
   SerialPrint(str);
 }
 
-//:GW# Get Scope Alignment Status
-/*Returns:
-  <mount><tracking><alignment>#
-  where:
-  mount: A-AzEl mounted, P-Equatorially mounted, G-german mounted equatorial
-  tracking: T-tracking, N-not tracking
-  alignment: 0-needs alignment, 1-one star aligned, 2-two star aligned, 3-three star aligned.
-*/
-void printalinhamento()
-{
-  SerialPrint("ANO#");
-}
 
 /*:GZ# Get telescope azimuth
   Returns: DDD*MM#T or DDD*MM'SS#*/
